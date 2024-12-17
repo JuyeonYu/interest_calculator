@@ -10,8 +10,11 @@ class CalculatorPage extends StatefulWidget {
 
 class _CalculatorPageState extends State<CalculatorPage> {
   int _selectedOption = 0;
-  List<double> interestRates = [0.0];
-  List<int> periods = [1];
+  final List<String> _payDesc = [
+    '원리금균등상환은 어쩌고 저쩌고',
+    '원금균등상환 어쩌고 저쩌고',
+    '원금일시상환 어쩌고 저쩌고',
+  ];
 
   void _onOptionSelected(int index) {
     setState(() {
@@ -19,75 +22,19 @@ class _CalculatorPageState extends State<CalculatorPage> {
     });
   }
 
-  void _addInterestRate() {
-    setState(() {
-      interestRates.add(0.0);
-      periods.add(1);
-    });
-  }
-
-  void _removeInterestRate(int index) {
-    setState(() {
-      interestRates.removeAt(index);
-      periods.removeAt(index);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Column(
+      
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SingleChildScrollView(
       padding: const EdgeInsets.all(16),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           const InputText(title: '대출원금', placeholder: '대출 원금을 입력해주세요', surfix: '만원',  isRequired: true, desc: ''),
-          Column(
-            children: List.generate(interestRates.length, (index) {
-              return Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: InputText(
-                          title: '이자율 ${index + 1}',
-                          placeholder: '이자율을 입력해주세요',
-                          surfix: '%',
-                          isRequired: true,
-                          desc: '',
-                        ),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.remove_circle),
-                        onPressed: () => _removeInterestRate(index),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Text('기간: '),
-                      Expanded(
-                        child: Slider(
-                          value: periods[index].toDouble(),
-                          min: 1,
-                          max: 36,
-                          divisions: 35,
-                          label: '${periods[index]} 개월',
-                          onChanged: (value) {
-                            setState(() {
-                              periods[index] = value.toInt();
-                            });
-                          },
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              );
-            }),
-          ),
-          TextButton(
-            onPressed: _addInterestRate,
-            child: const Text('이자율 추가'),
-          ),
+          const InputText(title: '이자율', placeholder: '이자율을 입력해주세요', surfix: '%', isRequired: true, desc: ''), 
           const InputText(title: '대출 기간', placeholder: '대출 기간을 입력해주세요', surfix: '개월', isRequired: true, desc: ''),
           const InputText(title: '거치 기간', placeholder: '거치 기간을 입력해주세요', surfix: '개월', isRequired: false, desc: ''),
 
@@ -101,9 +48,19 @@ class _CalculatorPageState extends State<CalculatorPage> {
               _buildOption(2, '원금\n일시상환'),
             ],
           ),
+          Text(_payDesc[_selectedOption]), 
         ],
       ),
-    );
+    ),
+    const Spacer(),
+    Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ElevatedButton(
+        onPressed: () {},
+        child: const Text('계산하기'),
+      ),
+    )
+    ],);
   }
 
   Widget _buildOption(int index, String text) {
