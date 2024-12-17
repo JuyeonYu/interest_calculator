@@ -23,7 +23,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MainTabPage extends StatefulWidget {
-  
   const MainTabPage({super.key});
 
   @override
@@ -33,13 +32,13 @@ class MainTabPage extends StatefulWidget {
 class _MainTabPageState extends State<MainTabPage> {
   int _bottomIndex = 0;
 
-final List<String> _titles = [
+  final List<String> _titles = [
     'Home',
     'Business',
     'School',
   ];
   final List<Widget> _children = [
-    const CalculatorPage(),
+    CalculatorPage(),
     const Text('Business'),
     const Text('School'),
   ];
@@ -48,7 +47,7 @@ final List<String> _titles = [
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex:_bottomIndex,
+        currentIndex: _bottomIndex,
         onTap: (value) => setState(() {
           _bottomIndex = value;
         }),
