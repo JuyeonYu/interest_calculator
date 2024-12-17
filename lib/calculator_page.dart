@@ -1,4 +1,5 @@
 import 'package:cal_interest/input_text.dart';
+import 'package:cal_interest/result_page.dart';
 import 'package:flutter/material.dart';
 
 class CalculatorPage extends StatefulWidget {
@@ -56,11 +57,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
     Padding(
       padding: const EdgeInsets.all(16.0),
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ResultPage()));
+        },
         child: const Text('계산하기'),
       ),
     )
-    ],);
+    ],
+    );
   }
 
   Widget _buildOption(int index, String text) {
