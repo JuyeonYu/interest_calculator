@@ -28,6 +28,10 @@ class _CalculatorPageState extends State<CalculatorPage> {
   void _onOptionSelected(int index) {
     setState(() {
       _selectedOption = index;
+      widget.calculatorInput = widget.calculatorInput.copyWith(
+        repaymentType: index,
+        description: _payDesc[index],
+      );
     });
   }
 
@@ -160,9 +164,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         interestRate: double.parse(value),
                       );
-                      // setState(() {
-                      //   _interestRate = double.parse(value);
-                      // });
                     },
                   ),
                   InputText(
