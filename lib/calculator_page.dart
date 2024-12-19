@@ -35,96 +35,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
     });
   }
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.stretch,
-  //     children: [
-  //       LayoutBuilder(
-  //         builder: (context, constraints) {
-  //           return SingleChildScrollView(
-  //             padding: const EdgeInsets.all(16),
-  //             child: ConstrainedBox(
-  //               constraints: BoxConstraints(
-  //                 minHeight: constraints.maxHeight,
-  //               ),
-  //               child: IntrinsicHeight(
-  //                 child: Column(
-  //                   crossAxisAlignment: CrossAxisAlignment.stretch,
-  //                   children: <Widget>[
-  //                     InputText(
-  //                       title: '대출원금',
-  //                       placeholder: '대출 원금을 입력해주세요',
-  //                       surfix: '만원',
-  //                       isRequired: true,
-  //                       desc: '',
-  //                       onChanged: (value) {
-  //                         widget.calculatorInput =
-  //                             widget.calculatorInput.copyWith(
-  //                           principal: double.parse(value),
-  //                           interestRate: null,
-  //                         );
-  //                       },
-  //                     ),
-  //                     InputText(
-  //                       title: '이자율',
-  //                       placeholder: '이자율을 입력해주세요',
-  //                       surfix: '%',
-  //                       isRequired: true,
-  //                       desc: '',
-  //                       onChanged: (value) {
-  //                         widget.calculatorInput =
-  //                             widget.calculatorInput.copyWith(
-  //                           interestRate: double.parse(value),
-  //                         );
-  //                       },
-  //                     ),
-  //                     InputText(
-  //                       title: '대출 기간',
-  //                       placeholder: '대출 기간을 입력해주세요',
-  //                       surfix: '개월',
-  //                       isRequired: true,
-  //                       desc: '',
-  //                       onChanged: (value) {},
-  //                     ),
-  //                     const InputText(
-  //                         title: '거치 기간',
-  //                         placeholder: '거치 기간을 입력해주세요',
-  //                         surfix: '개월',
-  //                         isRequired: false,
-  //                         desc: ''),
-  //                     const Text('상환방식'),
-  //                     Wrap(
-  //                       spacing: 8.0,
-  //                       runSpacing: 8.0,
-  //                       children: <Widget>[
-  //                         _buildOption(0, '원리금\n균등상환'),
-  //                         _buildOption(1, '원금\n균등상환'),
-  //                         _buildOption(2, '원금\n일시상환'),
-  //                       ],
-  //                     ),
-  //                     Text(_payDesc[_selectedOption]),
-  //                   ],
-  //                 ),
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //       ),
-  //       const Spacer(),
-  //       Padding(
-  //         padding: const EdgeInsets.all(16.0),
-  //         child: ElevatedButton(
-  //           onPressed: () {
-  //             Navigator.push(context,
-  //                 MaterialPageRoute(builder: (context) => const ResultPage()));
-  //           },
-  //           child: const Text('계산하기'),
-  //         ),
-  //       )
-  //     ],
-  //   );
-  // }
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -176,17 +86,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         term: int.parse(value),
                       );
-                      // setState(() {
-                      //   _term = int.parse(value);
-                      // });
                     },
-                  ),
-                  const InputText(
-                    title: '거치 기간',
-                    placeholder: '거치 기간을 입력해주세요',
-                    surfix: '개월',
-                    isRequired: false,
-                    desc: '',
                   ),
                   const Text('상환방식'),
                   Wrap(
@@ -199,6 +99,20 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     ],
                   ),
                   Text(_payDesc[_selectedOption]),
+                  if (_selectedOption == 0 || _selectedOption == 1)
+                    InputText(
+                      title: '거치 기간',
+                      placeholder: '거치 기간을 입력해주세요',
+                      surfix: '개월',
+                      isRequired: false,
+                      desc: '',
+                      onChanged: (value) {
+                        widget.calculatorInput =
+                            widget.calculatorInput.copyWith(
+                          delayTerm: int.parse(value),
+                        );
+                      },
+                    ),
                   const Spacer(),
                   Padding(
                     padding: const EdgeInsets.all(16.0),

@@ -1,17 +1,41 @@
 import 'dart:math';
 import 'calculate_result.dart';
 
+enum RepaymentType {
+  equalPrincipalAndInterest,
+  equalPrincipal,
+  lumpSumRepayment,
+}
+
+extension RepaymentTypeExtension on RepaymentType {
+  String value() {
+    switch (this) {
+      case RepaymentType.equalPrincipalAndInterest:
+        return '원리금 균등상환';
+      case RepaymentType.equalPrincipal:
+        return '원금 균등상환';
+      case RepaymentType.lumpSumRepayment:
+        return '원금 일시상환';
+    }
+  }
+}
+
 class CalculatorInput {
   final double principal;
   final double interestRate;
   final int term;
   final int repaymentType;
+
+  int? delayTerm;
+
+  RepaymentType get repaymentTypeEnum => RepaymentType.values[repaymentType];
   final String description;
 
   CalculatorInput({
     required this.principal,
     required this.interestRate,
     required this.term,
+    this.delayTerm,
     required this.repaymentType,
     required this.description,
   });
@@ -20,6 +44,7 @@ class CalculatorInput {
     double? principal,
     double? interestRate,
     int? term,
+    int? delayTerm,
     int? repaymentType,
     String? description,
   }) {
@@ -27,6 +52,7 @@ class CalculatorInput {
       principal: principal ?? this.principal,
       interestRate: interestRate ?? this.interestRate,
       term: term ?? this.term,
+      delayTerm: delayTerm ?? this.delayTerm,
       repaymentType: repaymentType ?? this.repaymentType,
       description: description ?? this.description,
     );
@@ -47,17 +73,32 @@ class CalculatorInput {
 
   // 원리금 균등상환 방식
   CalculateResult calculateEqualPrincipalAndInterest() {
-    double monthlyInterestRate = interestRate / 12;
+    double monthlyInterestRate = interestRate / 100 / 12;
     double monthlyPayment = principal *
         monthlyInterestRate /
-        (1 - pow(1 + monthlyInterestRate, -term));
-    double totalPayment = monthlyPayment * term;
+        (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
+    double totalPayment = monthlyPayment * (term - (delayTerm ?? 0)) +
+        (delayTerm ?? 0) * (principal * monthlyInterestRate);
     double totalInterest = totalPayment - principal;
     List<Map<String, double>> payments = [];
-    for (int i = 0; i < term; i++) {
+
+    if (delayTerm != null && delayTerm! > 0) {
+      for (int i = 0; i < delayTerm!; i++) {
+        double interestPayment = principal * monthlyInterestRate;
+        payments.add({
+          'monthlyPrincipal': 0,
+          'monthlyInterest': interestPayment,
+          'monthlyPayment': interestPayment,
+          'restPrincipal': principal,
+        });
+      }
+    }
+
+    for (int i = 0; i < term - (delayTerm ?? 0); i++) {
       double interestPayment =
           (principal - (principal * i / term)) * monthlyInterestRate;
       double principalPayment = monthlyPayment - interestPayment;
+
       payments.add({
         'monthlyPrincipal': principalPayment,
         'monthlyInterest': interestPayment,
@@ -76,13 +117,27 @@ class CalculatorInput {
 
   // 원금 균등상환 방식
   CalculateResult calculateEqualPrincipal() {
-    double monthlyInterestRate = interestRate / 12 / 100;
-    double monthlyPrincipal = principal / term;
+    double monthlyInterestRate = interestRate / 100 / 12;
+    double monthlyPrincipal = principal / (term - (delayTerm ?? 0));
     double restPrincipal = principal;
     List<Map<String, double>> payments = [];
     double totalInterest = 0;
-    for (int i = 0; i < term; i++) {
-      double interestPayment = restPrincipal * interestRate / 12;
+
+    if (delayTerm != null && delayTerm! > 0) {
+      for (int i = 0; i < delayTerm!; i++) {
+        double interestPayment = restPrincipal * monthlyInterestRate;
+        totalInterest += interestPayment;
+        payments.add({
+          'monthlyPrincipal': 0,
+          'monthlyInterest': interestPayment,
+          'monthlyPayment': interestPayment,
+          'restPrincipal': restPrincipal,
+        });
+      }
+    }
+
+    for (int i = 0; i < term - (delayTerm ?? 0); i++) {
+      double interestPayment = restPrincipal * monthlyInterestRate;
       double totalPayment = monthlyPrincipal + interestPayment;
 
       totalInterest += interestPayment;
@@ -95,9 +150,7 @@ class CalculatorInput {
       });
     }
     return CalculateResult(
-      monthlyPayment: monthlyPrincipal +
-          (principal *
-              monthlyInterestRate), // Monthly payment for the first month
+      monthlyPayment: monthlyPrincipal + (principal * monthlyInterestRate),
       totalPrincipal: principal,
       totalInterest: totalInterest,
       totalPayment: principal + totalInterest,
@@ -107,12 +160,12 @@ class CalculatorInput {
 
   // 원금 일시상환 방식
   CalculateResult calculateLumpSumRepayment() {
-    double totalInterest = principal * interestRate * term / 12;
+    double totalInterest = principal * interestRate / 100 * term / 12;
     double totalPayment = principal + totalInterest;
 
     List<Map<String, double>> payments = [];
     for (int i = 0; i < term; i++) {
-      double monthlyInterest = principal * interestRate / 12;
+      double monthlyInterest = principal * interestRate / 100 / 12;
       if (i == term - 1) {
         payments.add({
           'monthlyPrincipal': principal,

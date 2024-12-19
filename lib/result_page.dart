@@ -6,18 +6,52 @@ class ResultPage extends StatelessWidget {
   final CalculatorInput calculatorInput;
   const ResultPage({super.key, required this.calculatorInput});
 
-  // String formatCurrency(double amount) {
-  //   return amount.toStringAsFixed(2).replaceAllMapped(
-  //         RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-  //         (Match match) => '${match[1]},',
-  //       );
-  // }
-
   String formatCurrency(double amount) {
     return amount.toStringAsFixed(0).replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
           (Match match) => '${match[1]},',
         );
+  }
+
+  String convertToKorean(double amount) {
+    List<String> units = ['', '만', '억', '조', '경'];
+    List<String> numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+
+    if (amount == 0) return numbers[0];
+
+    String result = '';
+    int unitIndex = 0;
+
+    while (amount > 0) {
+      int chunk = (amount % 10000).toInt();
+      if (chunk > 0) {
+        String chunkStr = '';
+        while (chunk > 0) {
+          int digit = chunk % 10;
+          if (digit > 0) {
+            chunkStr = '${numbers[digit]}$chunkStr';
+          }
+          chunk ~/= 10;
+        }
+        result = chunkStr + units[unitIndex] + result;
+      }
+      amount /= 10000;
+      unitIndex++;
+    }
+
+    // Add commas every 3 digits
+    result = result.replaceAllMapped(
+      RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+      (Match match) => '${match[1]},',
+    );
+
+    // Add space between Korean characters and numbers
+    result = result.replaceAllMapped(
+      RegExp(r'([가-힣])(\d)'),
+      (Match match) => '${match[1]} ${match[2]}',
+    );
+
+    return result;
   }
 
   @override
@@ -30,19 +64,278 @@ class ResultPage extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('원금: ${formatCurrency(calculatorInput.principal)}'),
-            Text('이자율: ${calculatorInput.interestRate}%'),
-            Text('대출 기간: ${calculatorInput.term}개월'),
-            Text('Repayment Type: ${calculatorInput.repaymentType}'),
-            Text('Description: ${calculatorInput.description}'),
-            if (calculatorInput.repaymentType == 0 ||
-                calculatorInput.repaymentType == 2) ...[
-              Text('Monthly Payment: ${formatCurrency(result.monthlyPayment)}'),
-              Text('Total Principal: ${formatCurrency(result.totalPrincipal)}'),
-              Text('Total Interest: ${formatCurrency(result.totalInterest)}'),
-              Text('Total Payment: ${formatCurrency(result.totalPayment)}'),
-            ],
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(children: [
+                const Text(
+                  '원금',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                const Spacer(),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${formatCurrency(calculatorInput.principal)}원',
+                      style: const TextStyle(
+                        fontSize: 45,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                    Text(
+                      '${convertToKorean(calculatorInput.principal)} 원',
+                      style: TextStyle(
+                        fontSize: 25,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w300,
+                      ),
+                    ),
+                  ],
+                ),
+              ]),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(children: [
+                const Text(
+                  '이자율',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${formatCurrency(calculatorInput.interestRate)}%',
+                  style: const TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ]),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(children: [
+                const Text(
+                  '대출 기간',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${calculatorInput.term}개월',
+                  style: const TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ]),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(children: [
+                const Text(
+                  '대출 방법',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  calculatorInput.repaymentTypeEnum.value(),
+                  style: const TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ]),
+            ),
+
+            if (calculatorInput.delayTerm != null)
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(children: [
+                  const Text(
+                    '연기 기간',
+                    style: TextStyle(
+                      fontSize: 35,
+                      fontWeight: FontWeight.w100,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${calculatorInput.delayTerm}개월',
+                    style: const TextStyle(
+                      fontSize: 45,
+                      fontWeight: FontWeight.w900,
+                    ),
+                  ),
+                ]),
+              ),
+
+            const Divider(
+              color: Colors.black,
+              thickness: 0.5,
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(children: [
+                const Text(
+                  '첫 달 납부액',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${formatCurrency(result.payments!.first['monthlyPayment']!)}원',
+                  style: const TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ]),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(children: [
+                const Text(
+                  '마지막 달 납부액',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${formatCurrency(result.payments!.last['monthlyPayment']!)}원',
+                  style: const TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ]),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(children: [
+                const Text(
+                  '전체 이자 납부액',
+                  style: TextStyle(
+                    fontSize: 35,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                const Spacer(),
+                Text(
+                  '${formatCurrency(result.totalInterest)}원',
+                  style: const TextStyle(
+                    fontSize: 45,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ]),
+            ),
+
+            const Divider(
+              color: Colors.black,
+              thickness: 2,
+            ),
+
+            // Table(
+            //   border: TableBorder.all(),
+            //   columnWidths: const {
+            //     0: FlexColumnWidth(0.3),
+            //     1: FlexColumnWidth(0.7),
+            //   },
+            //   children: [
+            //     TableRow(children: [
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('원금',
+            //             style: TextStyle(
+            //                 fontWeight: FontWeight.bold, color: Colors.blue)),
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('${formatCurrency(calculatorInput.principal)}'),
+            //       ),
+            //     ]),
+            //     TableRow(children: [
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('이자율',
+            //             style: TextStyle(
+            //                 fontWeight: FontWeight.bold, color: Colors.blue)),
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('${calculatorInput.interestRate}%'),
+            //       ),
+            //     ]),
+            //     TableRow(children: [
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('대출 기간',
+            //             style: TextStyle(
+            //                 fontWeight: FontWeight.bold, color: Colors.blue)),
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('${calculatorInput.term}개월'),
+            //       ),
+            //     ]),
+            //     TableRow(children: [
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('Total Interest',
+            //             style: TextStyle(
+            //                 fontWeight: FontWeight.bold, color: Colors.blue)),
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('${formatCurrency(result.totalInterest)}'),
+            //       ),
+            //     ]),
+            //     TableRow(children: [
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('Repayment Type',
+            //             style: TextStyle(
+            //                 fontWeight: FontWeight.bold, color: Colors.blue)),
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('${calculatorInput.repaymentType}'),
+            //       ),
+            //     ]),
+            //     TableRow(children: [
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('Total Payment',
+            //             style: TextStyle(
+            //                 fontWeight: FontWeight.bold, color: Colors.blue)),
+            //       ),
+            //       Padding(
+            //         padding: EdgeInsets.all(8.0),
+            //         child: Text('${formatCurrency(result.totalPayment)}'),
+            //       ),
+            //     ]),
+            //   ],
+            // ),
             ...[
               Table(
                 border: TableBorder.all(),
