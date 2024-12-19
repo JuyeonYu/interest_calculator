@@ -229,6 +229,12 @@ class ResultPage extends StatelessWidget {
                       ),
                     ],
                   ),
+                  const Spacer(),
+                  Text(
+                    '${calculatorInput.delayTerm}개월',
+                    style: const TextStyle(
+                      fontSize: 45,
+                      fontWeight: FontWeight.w900,
                 ),
               const Divider(
                 color: Colors.black,
@@ -416,6 +422,7 @@ class ResultPage extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.w100,
                   ),
+                ]),
                 ),
               ),
               ...result.payments!.asMap().entries.map((entry) {
