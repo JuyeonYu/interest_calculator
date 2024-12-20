@@ -2,17 +2,12 @@ import 'package:cal_interest/calculator_input.dart';
 import 'package:flutter/material.dart';
 import 'calculate_result.dart';
 
-class ResultPage extends StatelessWidget {
-  final CalculatorInput calculatorInput;
-  const ResultPage({super.key, required this.calculatorInput});
-
-  String formatCurrency(double amount) {
+String formatCurrency(double amount) {
     return amount.toStringAsFixed(0).replaceAllMapped(
           RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
           (Match match) => '${match[1]},',
         );
   }
-
   String convertToKorean(double amount) {
     List<String> units = ['', '만', '억', '조', '경'];
     List<String> numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
@@ -53,6 +48,13 @@ class ResultPage extends StatelessWidget {
 
     return result;
   }
+class ResultPage extends StatelessWidget {
+  final CalculatorInput calculatorInput;
+  const ResultPage({super.key, required this.calculatorInput});
+
+  
+
+  
 
   @override
   Widget build(BuildContext context) {

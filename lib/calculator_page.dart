@@ -1,5 +1,6 @@
 import 'package:cal_interest/input_text.dart';
 import 'package:cal_interest/result_page.dart';
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:cal_interest/calculator_input.dart';
 
@@ -25,6 +26,10 @@ class _CalculatorPageState extends State<CalculatorPage> {
     '원금일시상환은 매 달 이자만 내고, 마지막 달에 원금을 한번에 상환하는 방식입니다. 이자가 가장 많이 발생합니다.',
   ];
 
+  final FocusNode _focusNode1 = FocusNode();
+  final FocusNode _focusNode2 = FocusNode();
+  final FocusNode _focusNode3 = FocusNode();
+
   void _onOptionSelected(int index) {
     setState(() {
       _selectedOption = index;
@@ -34,6 +39,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
       );
     });
   }
+
+    @override
+    void dispose() {
+      _focusNode1.dispose();
+      _focusNode2.dispose();
+      _focusNode3.dispose();
+      super.dispose();
+    }
 
   @override
   Widget build(BuildContext context) {
@@ -54,9 +67,16 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     placeholder: '대출 원금을 입력해주세요',
                     surfix: '만원',
                     isRequired: true,
+                    focusNode: _focusNode1,
                     desc: '',
+                    inputFormatters: [CurrencyTextInputFormatter.currency()],
+                    // inputFormatters: [CurrencyTextInputFormatter.currency()],
                     onChanged: (value) {
+                      setState(() {
                       if (value.isEmpty) {
+                        
+                          
+                        
                         widget.calculatorInput = widget.calculatorInput.copyWith(
                         principal: 0,);
                         return;
@@ -64,8 +84,15 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         principal: double.parse(value),
                       );
+                      });
                     },
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  ),
+                  Text(
+                    widget.calculatorInput.principal == 0
+                        ? ''
+                        : '${ convertToKorean(widget.calculatorInput.principal) }만원',
+                    style: const TextStyle(fontSize: 16),
                   ),
                   InputText(
                     title: '이자율',
@@ -84,7 +111,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         interestRate: double.parse(value),
                       );
                     },
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true), 
+                    focusNode: _focusNode2,
                   ),
                   InputText(
                     title: '대출 기간',
@@ -104,6 +132,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       );
                     },
                     keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                    focusNode: _focusNode3,
                   ),
                   GestureDetector(
                     child: const Row(
@@ -205,10 +234,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       desc: '',
                       onChanged: (value) {
                         if (value.isEmpty) {
-                          widget.calculatorInput =
-                            widget.calculatorInput.copyWith(
-                          delayTerm: 0,
-                        );
+                          widget.calculatorInput = widget.calculatorInput.copyWith(delayTerm: 0,);
                           return;
                         }
                         widget.calculatorInput =
@@ -256,6 +282,7 @@ bool _isValueValid() {
   }
   void _showInvalidSnackBar() {
     if (widget.calculatorInput.principal == 0) {
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('대출 원금을 입력해주세요'),

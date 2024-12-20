@@ -1,5 +1,6 @@
 import 'package:cal_interest/calculator_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MainTabPage(),
+      home: KeyboardDismissOnTap(child: const MainTabPage()),
     );
   }
 }

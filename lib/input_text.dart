@@ -1,3 +1,4 @@
+import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 
 class InputText extends StatelessWidget {
@@ -7,8 +8,9 @@ class InputText extends StatelessWidget {
   final String? surfix;
   final String desc;
   final ValueChanged<String>? onChanged;
-
+  final FocusNode? focusNode;
   final TextInputType keyboardType;
+  final List<CurrencyTextInputFormatter>? inputFormatters;
   const InputText({
     super.key,
     required this.title,
@@ -17,7 +19,9 @@ class InputText extends StatelessWidget {
     required this.isRequired,
     required this.desc,
     required this.keyboardType,
-    this.onChanged,
+    this.onChanged,  
+    this.focusNode,
+    this.inputFormatters,
   });
 
   @override
@@ -31,7 +35,18 @@ class InputText extends StatelessWidget {
           if (isRequired) const Text('*', style: TextStyle(color: Colors.red)),
         ]),
         TextField(
-          keyboardType: keyboardType,
+          inputFormatters: inputFormatters,
+          contextMenuBuilder: (context, editableTextState) {
+            final List<ContextMenuButtonItem> buttonItems =
+                editableTextState.contextMenuButtonItems;
+            buttonItems.removeWhere((ContextMenuButtonItem buttonItem) {
+              return buttonItem.type == ContextMenuButtonType.cut;
+            });
+            return AdaptiveTextSelectionToolbar.buttonItems(
+              anchors: editableTextState.contextMenuAnchors,
+              buttonItems: buttonItems,
+            );
+          },          keyboardType: keyboardType,
           decoration: InputDecoration(
             suffixIcon: Padding(
               padding: const EdgeInsets.all(8),
