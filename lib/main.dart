@@ -33,7 +33,7 @@ class _MainTabPageState extends State<MainTabPage> {
   int _bottomIndex = 0;
 
   final List<String> _titles = [
-    'Home',
+    '대출 이자 계산',
     'Business',
     'School',
   ];
@@ -46,26 +46,26 @@ class _MainTabPageState extends State<MainTabPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _bottomIndex,
-        onTap: (value) => setState(() {
-          _bottomIndex = value;
-        }),
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.business),
-            label: 'Business',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'School',
-          ),
-        ],
-      ),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   currentIndex: _bottomIndex,
+      //   onTap: (value) => setState(() {
+      //     _bottomIndex = value;
+      //   }),
+      //   items: const <BottomNavigationBarItem>[
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.home),
+      //       label: 'Home',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.business),
+      //       label: 'Business',
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(Icons.school),
+      //       label: 'School',
+      //     ),
+      //   ],
+      // ),
       appBar: AppBar(
         title: Text(_titles[_bottomIndex]),
       ),

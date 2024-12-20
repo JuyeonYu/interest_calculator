@@ -20,9 +20,9 @@ class CalculatorPage extends StatefulWidget {
 class _CalculatorPageState extends State<CalculatorPage> {
   int _selectedOption = 0;
   final List<String> _payDesc = [
-    '원리금균등상환은 어쩌고 저쩌고',
-    '원금균등상환 어쩌고 저쩌고',
-    '원금일시상환 어쩌고 저쩌고',
+    '원리금 균등상환 방식은 매 달 나가는 금액이 같습니다. 안정적인 미래를 예측하기 위해 가장 많이 사용됩니다.',
+    '세가지 방식 중 가장 내야하는 이자의 총액이 낮습니다. 첫 달부터 가장 많은 돈을 내서 부담이 있습니다.',
+    '원금일시상환은 매 달 이자만 내고, 마지막 달에 원금을 한번에 상환하는 방식입니다. 이자가 가장 많이 발생합니다.',
   ];
 
   void _onOptionSelected(int index) {
@@ -56,13 +56,16 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     isRequired: true,
                     desc: '',
                     onChanged: (value) {
+                      if (value.isEmpty) {
+                        widget.calculatorInput = widget.calculatorInput.copyWith(
+                        principal: 0,);
+                        return;
+                      }
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         principal: double.parse(value),
                       );
-                      // setState(() {
-                      //   _principal = double.parse(value);
-                      // });
                     },
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
                   InputText(
                     title: '이자율',
@@ -71,10 +74,17 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     isRequired: true,
                     desc: '',
                     onChanged: (value) {
+                      if (value.isEmpty) {
+                       widget.calculatorInput = widget.calculatorInput.copyWith(
+                        interestRate: 0,
+                      ); 
+                        return;
+                      }
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         interestRate: double.parse(value),
                       );
                     },
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   ),
                   InputText(
                     title: '대출 기간',
@@ -83,22 +93,109 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     isRequired: true,
                     desc: '',
                     onChanged: (value) {
+                      if (value.isEmpty) {
+                        widget.calculatorInput = widget.calculatorInput.copyWith(
+                        term: 0,
+                      );
+                        return;
+                      }
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         term: int.parse(value),
                       );
                     },
+                    keyboardType: const TextInputType.numberWithOptions(decimal: false),
                   ),
-                  const Text('상환방식'),
+                  GestureDetector(
+                    child: const Row(
+                      children: [
+                        Text('상환방식'),
+                        Icon(Icons.info),
+                      ],
+                    ), onTap: () {
+                      showModalBottomSheet(context: context, builder: (context) {
+                        return Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                        '미래를 계획하세요!',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        ),
+                                        IconButton(
+                                        icon: const Icon(Icons.close),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        ),
+                                      ],
+                                      ),
+                                  const SizedBox(height: 16),
+                                  Table(
+                                    border: TableBorder.all(),
+                                    children: const [
+                                      TableRow(
+                                        children: [
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('상환방식', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('매달 납부 금액', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('총 이자 비용', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('특징', style: TextStyle(fontWeight: FontWeight.bold)))),
+                                        ],
+                                      ),
+                                      TableRow(
+                                        children: [
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원리금 균등'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('일정함'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('중간 수준'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('안정적예측 가능'))),
+                                        ],
+                                      ),
+                                      TableRow(
+                                        children: [
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원금 균등'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('점점 줄어듦'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('가장 적음'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('초기 부담 큼, 총 비용 절약'))),
+                                        ],
+                                      ),
+                                      TableRow(
+                                        children: [
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원금 일시'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('이자만 납부'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('가장 많음'))),
+                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('초기 부담 적음, 마지막에 큰 금액 필요'))),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 16),
+                                ],
+                              ),
+                          );
+                      },);
+                    },
+                  ),
                   Wrap(
                     spacing: 8.0,
                     runSpacing: 8.0,
                     children: <Widget>[
-                      _buildOption(0, '원리금\n균등상환'),
-                      _buildOption(1, '원금\n균등상환'),
-                      _buildOption(2, '원금\n일시상환'),
+                      _buildOption(0, '원리금 균등'),
+                      _buildOption(1, '원금 균등'),
+                      _buildOption(2, '원금 일시'),
                     ],
                   ),
-                  Text(_payDesc[_selectedOption]),
+                  const SizedBox(height: 24,),
+                  const Divider(),
+                  const Padding(
+                    padding: EdgeInsets.fromLTRB(0, 24, 0, 16),
+                    child: Text('선택', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  ),
                   if (_selectedOption == 0 || _selectedOption == 1)
                     InputText(
                       title: '거치 기간',
@@ -107,16 +204,27 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       isRequired: false,
                       desc: '',
                       onChanged: (value) {
+                        if (value.isEmpty) {
+                          widget.calculatorInput =
+                            widget.calculatorInput.copyWith(
+                          delayTerm: 0,
+                        );
+                          return;
+                        }
                         widget.calculatorInput =
                             widget.calculatorInput.copyWith(
                           delayTerm: int.parse(value),
                         );
                       },
+                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
                     ),
                   const Spacer(),
                   Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                     child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _isValueValid() ? Colors.blue : Colors.grey[100],
+                      ),
                       onPressed: () {
                         if (_isValueValid()) {
                           Navigator.push(
@@ -126,9 +234,11 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                   calculatorInput: widget.calculatorInput),
                             ),
                           );
+                        } else {
+                          _showInvalidSnackBar();
                         }
                       },
-                      child: const Text('계산하기'),
+                      child: Text('계산하기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: _isValueValid() ? Colors.white : Colors.grey)),
                     ),
                   ),
                 ],
@@ -139,8 +249,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
       },
     );
   }
-
-  bool _isValueValid() {
+bool _isValueValid() {
+    return widget.calculatorInput.principal > 0 &&
+        widget.calculatorInput.interestRate > 0 &&
+        widget.calculatorInput.term > 0;
+  }
+  void _showInvalidSnackBar() {
     if (widget.calculatorInput.principal == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -160,9 +274,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
         ),
       );
     }
-    return widget.calculatorInput.principal > 0 &&
-        widget.calculatorInput.interestRate > 0 &&
-        widget.calculatorInput.term > 0;
   }
 
   Widget _buildOption(int index, String text) {
@@ -174,12 +285,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue : Colors.white,
-          border: Border.all(color: isSelected ? Colors.blue : Colors.grey),
+          color: isSelected ? Colors.blue[50] : Colors.grey[200],
+          border: Border.all(color: isSelected ? Colors.blue : Colors.transparent),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.blue.withOpacity(isSelected ? 0.1 : 0),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -192,8 +303,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
             text: TextSpan(
               text: text,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
-                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: isSelected ? Colors.blue : Colors.black,
+                fontWeight:isSelected ? FontWeight.bold: FontWeight.normal,
               ),
             ),
           ),
