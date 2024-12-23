@@ -58,7 +58,7 @@ class InputText extends StatelessWidget {
               borderSide: BorderSide(color: Colors.grey[300] ?? Colors.grey),
             ),
             focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.blue, width: 2),
+              borderSide: BorderSide(color: Colors.deepPurple, width: 2),
             ),
           ),
           onChanged: onChanged,

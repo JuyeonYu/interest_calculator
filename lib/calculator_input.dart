@@ -80,6 +80,7 @@ class CalculatorInput {
     double totalPayment = monthlyPayment * (term - (delayTerm ?? 0)) +
         (delayTerm ?? 0) * (principal * monthlyInterestRate);
     double totalInterest = totalPayment - principal;
+    
     List<Map<String, double>> payments = [];
 
     if (delayTerm != null && delayTerm! > 0) {
@@ -100,17 +101,17 @@ class CalculatorInput {
       double principalPayment = monthlyPayment - interestPayment;
 
       payments.add({
-        'monthlyPrincipal': principalPayment,
-        'monthlyInterest': interestPayment,
-        'monthlyPayment': monthlyPayment,
-        'restPrincipal': principal - (principal * (i + 1) / term),
+        'monthlyPrincipal': principalPayment * 10000,
+        'monthlyInterest': interestPayment * 10000,
+        'monthlyPayment': monthlyPayment * 10000,
+        'restPrincipal': principal - (principal * (i + 1) / term) * 10000,
       });
     }
     return CalculateResult(
       monthlyPayment: monthlyPayment,
       totalPrincipal: principal,
-      totalInterest: totalInterest,
-      totalPayment: totalPayment,
+      totalInterest: totalInterest * 10000,
+      totalPayment: totalPayment * 10000,
       payments: payments,
     );
   }
@@ -129,9 +130,9 @@ class CalculatorInput {
         totalInterest += interestPayment;
         payments.add({
           'monthlyPrincipal': 0,
-          'monthlyInterest': interestPayment,
-          'monthlyPayment': interestPayment,
-          'restPrincipal': restPrincipal,
+          'monthlyInterest': interestPayment * 10000,
+          'monthlyPayment': interestPayment * 10000,
+          'restPrincipal': restPrincipal * 10000,
         });
       }
     }
@@ -143,16 +144,16 @@ class CalculatorInput {
       totalInterest += interestPayment;
       restPrincipal -= monthlyPrincipal;
       payments.add({
-        'monthlyPrincipal': monthlyPrincipal,
-        'monthlyInterest': interestPayment,
-        'monthlyPayment': totalPayment,
-        'restPrincipal': restPrincipal,
+        'monthlyPrincipal': monthlyPrincipal * 10000,
+        'monthlyInterest': interestPayment * 10000,
+        'monthlyPayment': totalPayment * 10000,
+        'restPrincipal': restPrincipal * 10000,
       });
     }
     return CalculateResult(
       monthlyPayment: monthlyPrincipal + (principal * monthlyInterestRate),
       totalPrincipal: principal,
-      totalInterest: totalInterest,
+      totalInterest: totalInterest * 10000,
       totalPayment: principal + totalInterest,
       payments: payments,
     );
@@ -168,16 +169,16 @@ class CalculatorInput {
       double monthlyInterest = principal * interestRate / 100 / 12;
       if (i == term - 1) {
         payments.add({
-          'monthlyPrincipal': principal,
-          'monthlyInterest': monthlyInterest,
+          'monthlyPrincipal': principal * 10000,
+          'monthlyInterest': monthlyInterest * 10000,
           'monthlyPayment': principal + monthlyInterest,
           'restPrincipal': 0,
         });
       } else {
         payments.add({
           'monthlyPrincipal': 0,
-          'monthlyInterest': monthlyInterest,
-          'monthlyPayment': monthlyInterest,
+          'monthlyInterest': monthlyInterest * 10000,
+          'monthlyPayment': monthlyInterest * 10000,
           'restPrincipal': principal,
         });
       }
@@ -185,7 +186,7 @@ class CalculatorInput {
     return CalculateResult(
       monthlyPayment: totalPayment / term,
       totalPrincipal: principal,
-      totalInterest: totalInterest,
+      totalInterest: totalInterest * 10000,
       totalPayment: totalPayment,
       payments: payments,
     );

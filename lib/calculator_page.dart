@@ -20,6 +20,7 @@ class CalculatorPage extends StatefulWidget {
 
 class _CalculatorPageState extends State<CalculatorPage> {
   int _selectedOption = 0;
+  bool _isValueValid = true;
   final List<String> _payDesc = [
     '원리금 균등상환 방식은 매 달 나가는 금액이 같습니다. 안정적인 미래를 예측하기 위해 가장 많이 사용됩니다.',
     '세가지 방식 중 가장 내야하는 이자의 총액이 낮습니다. 첫 달부터 가장 많은 돈을 내서 부담이 있습니다.',
@@ -69,18 +70,19 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     isRequired: true,
                     focusNode: _focusNode1,
                     desc: '',
-                    inputFormatters: [CurrencyTextInputFormatter.currency()],
-                    // inputFormatters: [CurrencyTextInputFormatter.currency()],
+                                 inputFormatters:  [CurrencyTextInputFormatter.currency(
+                locale: 'ko',
+                decimalDigits: 0,
+                symbol: '',
+              )],
                     onChanged: (value) {
                       setState(() {
                       if (value.isEmpty) {
-                        
-                          
-                        
                         widget.calculatorInput = widget.calculatorInput.copyWith(
                         principal: 0,);
                         return;
                       }
+                      value = value.replaceAll(RegExp(r'[^0-9]'), '');
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         principal: double.parse(value),
                       );
@@ -91,7 +93,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                   Text(
                     widget.calculatorInput.principal == 0
                         ? ''
-                        : '${ convertToKorean(widget.calculatorInput.principal) }만원',
+                        : '${ formatKoreanCurrency(widget.calculatorInput.principal) }원',
                     style: const TextStyle(fontSize: 16),
                   ),
                   InputText(
@@ -101,6 +103,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     isRequired: true,
                     desc: '',
                     onChanged: (value) {
+                      setState(() {
                       if (value.isEmpty) {
                        widget.calculatorInput = widget.calculatorInput.copyWith(
                         interestRate: 0,
@@ -110,7 +113,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         interestRate: double.parse(value),
                       );
-                    },
+                    });},
                     keyboardType: const TextInputType.numberWithOptions(decimal: true), 
                     focusNode: _focusNode2,
                   ),
@@ -138,7 +141,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     child: const Row(
                       children: [
                         Text('상환방식'),
-                        Icon(Icons.info),
+                        Icon(Icons.info, color: Colors.deepPurple),
                       ],
                     ), onTap: () {
                       showModalBottomSheet(context: context, builder: (context) {
@@ -220,39 +223,49 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     ],
                   ),
                   const SizedBox(height: 24,),
-                  const Divider(),
-                  const Padding(
-                    padding: EdgeInsets.fromLTRB(0, 24, 0, 16),
-                    child: Text('선택', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  
+                  if (_selectedOption == 0 || _selectedOption == 1) 
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(0, 24, 0, 16),
+                        child: Text('선택', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      ),
+                      InputText(
+                        title: '거치 기간',
+                        placeholder: '거치 기간을 입력해주세요',
+                        surfix: '개월',
+                        isRequired: false,
+                        desc: '',
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            widget.calculatorInput = widget.calculatorInput.copyWith(delayTerm: 0,);
+                            return;
+                          }
+                          widget.calculatorInput =
+                              widget.calculatorInput.copyWith(
+                            delayTerm: int.parse(value),
+                          );
+                        },
+                        keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                      ),
+                    ],
                   ),
-                  if (_selectedOption == 0 || _selectedOption == 1)
-                    InputText(
-                      title: '거치 기간',
-                      placeholder: '거치 기간을 입력해주세요',
-                      surfix: '개월',
-                      isRequired: false,
-                      desc: '',
-                      onChanged: (value) {
-                        if (value.isEmpty) {
-                          widget.calculatorInput = widget.calculatorInput.copyWith(delayTerm: 0,);
-                          return;
-                        }
-                        widget.calculatorInput =
-                            widget.calculatorInput.copyWith(
-                          delayTerm: int.parse(value),
-                        );
-                      },
-                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                    ),
+                    
+                    
                   const Spacer(),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _isValueValid() ? Colors.blue : Colors.grey[100],
+                        backgroundColor: _isValueValid ? Colors.deepPurple : Colors.grey[100],
                       ),
                       onPressed: () {
-                        if (_isValueValid()) {
+                        if (widget.calculatorInput.principal > 0 &&
+                            widget.calculatorInput.interestRate > 0 &&
+                            widget.calculatorInput.term > 0) {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
@@ -264,7 +277,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                           _showInvalidSnackBar();
                         }
                       },
-                      child: Text('계산하기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: _isValueValid() ? Colors.white : Colors.grey)),
+                      child: const Text('계산하기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                   ),
                 ],
@@ -275,10 +288,11 @@ class _CalculatorPageState extends State<CalculatorPage> {
       },
     );
   }
-bool _isValueValid() {
-    return widget.calculatorInput.principal > 0 &&
+void _checkValueValid() {
+  _isValueValid = widget.calculatorInput.principal > 0 &&
         widget.calculatorInput.interestRate > 0 &&
         widget.calculatorInput.term > 0;
+        // return _isValueValid;
   }
   void _showInvalidSnackBar() {
     if (widget.calculatorInput.principal == 0) {
@@ -312,12 +326,12 @@ bool _isValueValid() {
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue[50] : Colors.grey[200],
-          border: Border.all(color: isSelected ? Colors.blue : Colors.transparent),
+          color: isSelected ? Colors.deepPurple[50] : Colors.grey[200],
+          border: Border.all(color: isSelected ? Colors.deepPurple : Colors.transparent),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.blue.withOpacity(isSelected ? 0.1 : 0),
+              color: Colors.deepPurple.withOpacity(isSelected ? 0.1 : 0),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -331,7 +345,7 @@ bool _isValueValid() {
               text: text,
               style: TextStyle(
                 fontSize: 16,
-                color: isSelected ? Colors.blue : Colors.black,
+                color: isSelected ? Colors.deepPurple : Colors.black,
                 fontWeight:isSelected ? FontWeight.bold: FontWeight.normal,
               ),
             ),
