@@ -149,7 +149,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     child: const Row(
                       children: [
                         Text('상환방식'),
-                        Icon(Icons.info, color: Colors.deepPurple),
+                        Icon(Icons.info, color: Colors.blue),
                       ],
                     ),
                     onTap: () {
@@ -340,9 +340,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _isValueValid
-                            ? Colors.deepPurple
-                            : Colors.grey[100],
+                        backgroundColor:
+                            _isValueValid ? Colors.blue : Colors.grey[100],
                       ),
                       onPressed: () {
                         if (widget.calculatorInput.principal > 0 &&
@@ -359,11 +358,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
                           _showInvalidSnackBar();
                         }
                       },
-                      child: const Text('계산하기',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: const Text('계산하기',
+                            style: TextStyle(
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white)),
+                      ),
                     ),
                   ),
                 ],
@@ -413,13 +415,13 @@ class _CalculatorPageState extends State<CalculatorPage> {
         padding: const EdgeInsets.all(12),
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.deepPurple[50] : Colors.grey[200],
-          border: Border.all(
-              color: isSelected ? Colors.deepPurple : Colors.transparent),
+          color: isSelected ? Colors.blue[50] : Colors.grey[200],
+          border:
+              Border.all(color: isSelected ? Colors.blue : Colors.transparent),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.deepPurple.withOpacity(isSelected ? 0.1 : 0),
+              color: Colors.blue.withOpacity(isSelected ? 0.1 : 0),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -433,7 +435,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
               text: text,
               style: TextStyle(
                 fontSize: 16,
-                color: isSelected ? Colors.deepPurple : Colors.black,
+                color: isSelected ? Colors.blue : Colors.black,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

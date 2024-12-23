@@ -257,7 +257,7 @@ class ResultPage extends StatelessWidget {
                                 fontWeight: FontWeight.w100,
                               ),
                             ),
-                            Icon(Icons.info, color: Colors.deepPurple),
+                            Icon(Icons.info, color: Colors.blue),
                           ],
                         ),
                         onTap: () {
@@ -282,7 +282,7 @@ class ResultPage extends StatelessWidget {
                           style: const TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
-                              color: Colors.deepPurple),
+                              color: Colors.blue),
                         ),
                         Text(
                           '${formatKoreanCurrency(result.totalInterest / 10000)} 원',
