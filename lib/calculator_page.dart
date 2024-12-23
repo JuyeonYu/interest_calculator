@@ -146,10 +146,10 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     focusNode: _focusNode3,
                   ),
                   GestureDetector(
-                    child: const Row(
+                    child: Row(
                       children: [
-                        Text('상환방식'),
-                        Icon(Icons.info, color: Colors.blue),
+                        const Text('상환방식'),
+                        Icon(Icons.info, color: Colors.blue[700]),
                       ],
                     ),
                     onTap: () {
@@ -341,7 +341,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor:
-                            _isValueValid ? Colors.blue : Colors.grey[100],
+                            _isValueValid ? Colors.blue[900] : Colors.grey[100],
                       ),
                       onPressed: () {
                         if (widget.calculatorInput.principal > 0 &&
@@ -358,9 +358,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                           _showInvalidSnackBar();
                         }
                       },
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: const Text('계산하기',
+                      child: const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text('계산하기',
                             style: TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -416,12 +416,14 @@ class _CalculatorPageState extends State<CalculatorPage> {
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? Colors.blue[50] : Colors.grey[200],
-          border:
-              Border.all(color: isSelected ? Colors.blue : Colors.transparent),
+          border: Border.all(
+              color: isSelected
+                  ? (Colors.blue[900] ?? Colors.blue)
+                  : Colors.transparent),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.blue.withOpacity(isSelected ? 0.1 : 0),
+              color: Colors.blue[900]!.withOpacity(isSelected ? 0.1 : 0),
               spreadRadius: 2,
               blurRadius: 5,
               offset: const Offset(0, 3),
@@ -435,7 +437,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
               text: text,
               style: TextStyle(
                 fontSize: 16,
-                color: isSelected ? Colors.blue : Colors.black,
+                color: isSelected ? Colors.blue[900] : Colors.black,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),

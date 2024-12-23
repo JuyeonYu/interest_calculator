@@ -248,16 +248,16 @@ class ResultPage extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
                       child: GestureDetector(
-                        child: const Row(
+                        child: Row(
                           children: [
-                            Text(
+                            const Text(
                               '전체 이자',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w100,
                               ),
                             ),
-                            Icon(Icons.info, color: Colors.blue),
+                            Icon(Icons.info, color: Colors.blue[900]),
                           ],
                         ),
                         onTap: () {
@@ -279,10 +279,10 @@ class ResultPage extends StatelessWidget {
                       children: [
                         Text(
                           '${formatCurrency(result.totalInterest)}만 원',
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
-                              color: Colors.blue),
+                              color: Colors.blue[700]),
                         ),
                         Text(
                           '${formatKoreanCurrency(result.totalInterest / 10000)} 원',
