@@ -19,7 +19,7 @@ class InputText extends StatelessWidget {
     required this.isRequired,
     required this.desc,
     required this.keyboardType,
-    this.onChanged,  
+    this.onChanged,
     this.focusNode,
     this.inputFormatters,
   });
@@ -35,6 +35,7 @@ class InputText extends StatelessWidget {
           if (isRequired) const Text('*', style: TextStyle(color: Colors.red)),
         ]),
         TextField(
+          style: const TextStyle(fontSize: 24),
           inputFormatters: inputFormatters,
           contextMenuBuilder: (context, editableTextState) {
             final List<ContextMenuButtonItem> buttonItems =
@@ -46,11 +47,16 @@ class InputText extends StatelessWidget {
               anchors: editableTextState.contextMenuAnchors,
               buttonItems: buttonItems,
             );
-          },          keyboardType: keyboardType,
+          },
+          keyboardType: keyboardType,
           decoration: InputDecoration(
             suffixIcon: Padding(
               padding: const EdgeInsets.all(8),
-              child: Text(surfix ?? '', style: const TextStyle(color: Colors.black, fontSize: 24, fontWeight: FontWeight.bold)),
+              child: Text(surfix ?? '',
+                  style: const TextStyle(
+                      color: Colors.black,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold)),
             ),
             hintText: placeholder,
             hintStyle: const TextStyle(color: Colors.grey, fontSize: 24),
@@ -63,7 +69,15 @@ class InputText extends StatelessWidget {
           ),
           onChanged: onChanged,
         ),
-        Text(desc),
+        if (desc.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 8, 0, 0),
+            child: Text(
+              desc,
+              style: const TextStyle(fontSize: 16),
+            ),
+          ),
+        const SizedBox(height: 24),
       ],
     );
   }

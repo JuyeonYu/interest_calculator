@@ -4,13 +4,12 @@ import 'calculate_result.dart';
 
 String formatCurrency(double amount) {
   return amount.toStringAsFixed(0).replaceAllMapped(
-    RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
-    (Match match) => '${match[1]},',
-  );
+        RegExp(r'(\d)(?=(\d{3})+(?!\d))'),
+        (Match match) => '${match[1]},',
+      );
 }
 
 String formatKoreanCurrency(double input) {
-
   // if (input == null) return "0";
   if (input == 0) return "0";
 
@@ -19,8 +18,9 @@ String formatKoreanCurrency(double input) {
 
   // 만 단위를 문자열로 포맷팅 (3자리 콤마 추가)
   String formattedMan = man.toString().replaceAllMapped(
-    RegExp(r'(\d)(?=(\d{3})+$)'), (match) => '${match[1]},',
-  );
+        RegExp(r'(\d)(?=(\d{3})+$)'),
+        (match) => '${match[1]},',
+      );
 
   String result = "";
 
@@ -38,8 +38,7 @@ String formatKoreanCurrency(double input) {
   return result;
 }
 
-
-  String convertToKorean(double amount) {
+String convertToKorean(double amount) {
   List<String> units = ['', '만', '억', '조', '경'];
   List<String> numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
@@ -79,13 +78,10 @@ String convertToKoreanWithDecimal(double amount) {
 
   return '$integerPartKorean원 $decimalPartKorean전';
 }
+
 class ResultPage extends StatelessWidget {
   final CalculatorInput calculatorInput;
   const ResultPage({super.key, required this.calculatorInput});
-
-  
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -229,12 +225,6 @@ class ResultPage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const Spacer(),
-                  Text(
-                    '${calculatorInput.delayTerm}개월',
-                    style: const TextStyle(
-                      fontSize: 45,
-                      fontWeight: FontWeight.w900,
                 ),
               const Divider(
                 color: Colors.black,
@@ -271,73 +261,15 @@ class ResultPage extends StatelessWidget {
                           ],
                         ),
                         onTap: () {
-                          showModalBottomSheet(context: context, builder: (context) {
-                            var calculatorInput0 = calculatorInput.copyWith(repaymentType: 0);
-                            var calculatorInput1 = calculatorInput.copyWith(repaymentType: 1);
-                            var calculatorInput2 = calculatorInput.copyWith(repaymentType: 2);
-
-                           CalculateResult result0 = calculatorInput0.calculateResult();
-                           CalculateResult result1 = calculatorInput1.calculateResult();
-                           CalculateResult result2 = calculatorInput2.calculateResult();
-                        return Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        const Text(
-                                        '납부 방식 비교',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        ),
-                                        IconButton(
-                                        icon: const Icon(Icons.close),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        ),
-                                      ],
-                                      ),
-                                  const SizedBox(height: 16),
-                                  Table(
-                                    border: TableBorder.all(),
-                                    children: [
-                                      const TableRow(
-                                        children: [
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('상환방식', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('전체 이자(원)'))),
-                                        ],
-                                      ),
-                                      TableRow(
-                                        children: [
-                                          const TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원금 균등'))),
-                                          TableCell(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(formatCurrency(result1.totalInterest)))),
-                                        ],
-                                      ),
-                                      TableRow(
-                                        children: [
-                                          const TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원리금 균등'))),
-                                          TableCell(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(formatCurrency(result0.totalInterest)))),
-                                        ],
-                                      ),
-                                      
-                                      TableRow(
-                                        children: [
-                                          const TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원금 일시'))),
-                                          TableCell(child: Padding(padding: const EdgeInsets.all(8.0), child: Text(formatCurrency(result2.totalInterest)))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                ],
-                              ),
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return Dialog(
+                                child: CompareInterestView(
+                                    calculatorInput: calculatorInput),
+                              );
+                            },
                           );
-                      },);
                         },
                       ),
                     ),
@@ -348,10 +280,9 @@ class ResultPage extends StatelessWidget {
                         Text(
                           '${formatCurrency(result.totalInterest)}만 원',
                           style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.w900,
-                            color: Colors.deepPurple
-                          ),
+                              fontSize: 24,
+                              fontWeight: FontWeight.w900,
+                              color: Colors.deepPurple),
                         ),
                         Text(
                           '${formatKoreanCurrency(result.totalInterest / 10000)} 원',
@@ -366,6 +297,7 @@ class ResultPage extends StatelessWidget {
                   ],
                 ),
               ),
+              // CompareInterestView(calculatorInput: calculatorInput),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Row(
@@ -422,7 +354,6 @@ class ResultPage extends StatelessWidget {
                     fontSize: 18,
                     fontWeight: FontWeight.w100,
                   ),
-                ]),
                 ),
               ),
               ...result.payments!.asMap().entries.map((entry) {
@@ -446,8 +377,10 @@ class ResultPage extends StatelessWidget {
                               ),
                             ),
                           ),
-                          if (index ~/ 12 > 0) Text('${index ~/ 12}년 ${index % 12}개월'),
-                          if (index ~/ 12 == 0 && index % 12 > 0) Text('${index % 12}개월'),
+                          if (index ~/ 12 > 0)
+                            Text('${index ~/ 12}년 ${index % 12}개월'),
+                          if (index ~/ 12 == 0 && index % 12 > 0)
+                            Text('${index % 12}개월'),
                         ],
                       ),
                       const Spacer(),
@@ -500,6 +433,173 @@ class ResultPage extends StatelessWidget {
               child: const Icon(Icons.arrow_upward),
             ),
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class CompareInterestView extends StatelessWidget {
+  const CompareInterestView({
+    super.key,
+    required this.calculatorInput,
+  });
+
+  final CalculatorInput calculatorInput;
+
+  @override
+  Widget build(BuildContext context) {
+    var calculatorInput0 = calculatorInput.copyWith(repaymentType: 0);
+    var calculatorInput1 = calculatorInput.copyWith(repaymentType: 1);
+    var calculatorInput2 = calculatorInput.copyWith(repaymentType: 2);
+
+    CalculateResult result0 = calculatorInput0.calculateResult();
+    CalculateResult result1 = calculatorInput1.calculateResult();
+    CalculateResult result2 = calculatorInput2.calculateResult();
+
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                '납부 방식 비교',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w100,
+                ),
+              ),
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Table(
+            border: TableBorder.all(color: Colors.grey),
+            children: [
+              const TableRow(
+                children: [
+                  TableCell(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        '상환방식',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TableCell(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        '전체 이자(원)',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w900,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              TableRow(
+                children: [
+                  const TableCell(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        '원금 균등',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        formatCurrency(result1.totalInterest),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              TableRow(
+                children: [
+                  const TableCell(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        '원리금 균등',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        formatCurrency(result0.totalInterest),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              TableRow(
+                children: [
+                  const TableCell(
+                    child: Padding(
+                      padding: EdgeInsets.all(8.0),
+                      child: Text(
+                        '원금 일시',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                  TableCell(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        formatCurrency(result2.totalInterest),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 18,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
         ],
       ),
     );

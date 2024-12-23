@@ -41,13 +41,13 @@ class _CalculatorPageState extends State<CalculatorPage> {
     });
   }
 
-    @override
-    void dispose() {
-      _focusNode1.dispose();
-      _focusNode2.dispose();
-      _focusNode3.dispose();
-      super.dispose();
-    }
+  @override
+  void dispose() {
+    _focusNode1.dispose();
+    _focusNode2.dispose();
+    _focusNode3.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,32 +69,34 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     surfix: '만원',
                     isRequired: true,
                     focusNode: _focusNode1,
-                    desc: '',
-                                 inputFormatters:  [CurrencyTextInputFormatter.currency(
-                locale: 'ko',
-                decimalDigits: 0,
-                symbol: '',
-              )],
+                    desc: widget.calculatorInput.principal == 0
+                        ? ''
+                        : '${formatKoreanCurrency(widget.calculatorInput.principal)}원',
+                    inputFormatters: [
+                      CurrencyTextInputFormatter.currency(
+                        locale: 'ko',
+                        decimalDigits: 0,
+                        symbol: '',
+                      )
+                    ],
                     onChanged: (value) {
                       setState(() {
-                      if (value.isEmpty) {
-                        widget.calculatorInput = widget.calculatorInput.copyWith(
-                        principal: 0,);
-                        return;
-                      }
-                      value = value.replaceAll(RegExp(r'[^0-9]'), '');
-                      widget.calculatorInput = widget.calculatorInput.copyWith(
-                        principal: double.parse(value),
-                      );
+                        if (value.isEmpty) {
+                          widget.calculatorInput =
+                              widget.calculatorInput.copyWith(
+                            principal: 0,
+                          );
+                          return;
+                        }
+                        value = value.replaceAll(RegExp(r'[^0-9]'), '');
+                        widget.calculatorInput =
+                            widget.calculatorInput.copyWith(
+                          principal: double.parse(value),
+                        );
                       });
                     },
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  ),
-                  Text(
-                    widget.calculatorInput.principal == 0
-                        ? ''
-                        : '${ formatKoreanCurrency(widget.calculatorInput.principal) }원',
-                    style: const TextStyle(fontSize: 16),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                   ),
                   InputText(
                     title: '이자율',
@@ -104,17 +106,21 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     desc: '',
                     onChanged: (value) {
                       setState(() {
-                      if (value.isEmpty) {
-                       widget.calculatorInput = widget.calculatorInput.copyWith(
-                        interestRate: 0,
-                      ); 
-                        return;
-                      }
-                      widget.calculatorInput = widget.calculatorInput.copyWith(
-                        interestRate: double.parse(value),
-                      );
-                    });},
-                    keyboardType: const TextInputType.numberWithOptions(decimal: true), 
+                        if (value.isEmpty) {
+                          widget.calculatorInput =
+                              widget.calculatorInput.copyWith(
+                            interestRate: 0,
+                          );
+                          return;
+                        }
+                        widget.calculatorInput =
+                            widget.calculatorInput.copyWith(
+                          interestRate: double.parse(value),
+                        );
+                      });
+                    },
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
                     focusNode: _focusNode2,
                   ),
                   InputText(
@@ -125,16 +131,18 @@ class _CalculatorPageState extends State<CalculatorPage> {
                     desc: '',
                     onChanged: (value) {
                       if (value.isEmpty) {
-                        widget.calculatorInput = widget.calculatorInput.copyWith(
-                        term: 0,
-                      );
+                        widget.calculatorInput =
+                            widget.calculatorInput.copyWith(
+                          term: 0,
+                        );
                         return;
                       }
                       widget.calculatorInput = widget.calculatorInput.copyWith(
                         term: int.parse(value),
                       );
                     },
-                    keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: false),
                     focusNode: _focusNode3,
                   ),
                   GestureDetector(
@@ -143,74 +151,141 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         Text('상환방식'),
                         Icon(Icons.info, color: Colors.deepPurple),
                       ],
-                    ), onTap: () {
-                      showModalBottomSheet(context: context, builder: (context) {
-                        return Padding(
+                    ),
+                    onTap: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (context) {
+                          return Padding(
                             padding: const EdgeInsets.all(8.0),
                             child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    const Text(
+                                      '미래를 계획하세요!',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.close),
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                                Table(
+                                  border: TableBorder.all(),
+                                  children: const [
+                                    TableRow(
                                       children: [
-                                        const Text(
-                                        '미래를 계획하세요!',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        ),
-                                        IconButton(
-                                        icon: const Icon(Icons.close),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        ),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('상환방식',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold)))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('매달 납부 금액',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold)))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('총 이자 비용',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold)))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('특징',
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold)))),
                                       ],
-                                      ),
-                                  const SizedBox(height: 16),
-                                  Table(
-                                    border: TableBorder.all(),
-                                    children: const [
-                                      TableRow(
-                                        children: [
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('상환방식', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('매달 납부 금액', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('총 이자 비용', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('특징', style: TextStyle(fontWeight: FontWeight.bold)))),
-                                        ],
-                                      ),
-                                      TableRow(
-                                        children: [
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원리금 균등'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('일정함'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('중간 수준'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('안정적예측 가능'))),
-                                        ],
-                                      ),
-                                      TableRow(
-                                        children: [
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원금 균등'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('점점 줄어듦'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('가장 적음'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('초기 부담 큼, 총 비용 절약'))),
-                                        ],
-                                      ),
-                                      TableRow(
-                                        children: [
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('원금 일시'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('이자만 납부'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('가장 많음'))),
-                                          TableCell(child: Padding(padding: EdgeInsets.all(8.0), child: Text('초기 부담 적음, 마지막에 큰 금액 필요'))),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 16),
-                                ],
-                              ),
+                                    ),
+                                    TableRow(
+                                      children: [
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('원리금 균등'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('일정함'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('중간 수준'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('안정적예측 가능'))),
+                                      ],
+                                    ),
+                                    TableRow(
+                                      children: [
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('원금 균등'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('점점 줄어듦'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('가장 적음'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child:
+                                                    Text('초기 부담 큼, 총 비용 절약'))),
+                                      ],
+                                    ),
+                                    TableRow(
+                                      children: [
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('원금 일시'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('이자만 납부'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text('가장 많음'))),
+                                        TableCell(
+                                            child: Padding(
+                                                padding: EdgeInsets.all(8.0),
+                                                child: Text(
+                                                    '초기 부담 적음, 마지막에 큰 금액 필요'))),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 16),
+                              ],
+                            ),
                           );
-                      },);
+                        },
+                      );
                     },
                   ),
                   Wrap(
@@ -222,45 +297,52 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       _buildOption(2, '원금 일시'),
                     ],
                   ),
-                  const SizedBox(height: 24,),
-                  
-                  if (_selectedOption == 0 || _selectedOption == 1) 
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Divider(),
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(0, 24, 0, 16),
-                        child: Text('선택', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      ),
-                      InputText(
-                        title: '거치 기간',
-                        placeholder: '거치 기간을 입력해주세요',
-                        surfix: '개월',
-                        isRequired: false,
-                        desc: '',
-                        onChanged: (value) {
-                          if (value.isEmpty) {
-                            widget.calculatorInput = widget.calculatorInput.copyWith(delayTerm: 0,);
-                            return;
-                          }
-                          widget.calculatorInput =
-                              widget.calculatorInput.copyWith(
-                            delayTerm: int.parse(value),
-                          );
-                        },
-                        keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                      ),
-                    ],
+                  const SizedBox(
+                    height: 24,
                   ),
-                    
-                    
+                  if (_selectedOption == 0 || _selectedOption == 1)
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Divider(),
+                        const Padding(
+                          padding: EdgeInsets.fromLTRB(0, 24, 0, 16),
+                          child: Text('선택',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.bold)),
+                        ),
+                        InputText(
+                          title: '거치 기간',
+                          placeholder: '거치 기간을 입력해주세요',
+                          surfix: '개월',
+                          isRequired: false,
+                          desc: '',
+                          onChanged: (value) {
+                            if (value.isEmpty) {
+                              widget.calculatorInput =
+                                  widget.calculatorInput.copyWith(
+                                delayTerm: 0,
+                              );
+                              return;
+                            }
+                            widget.calculatorInput =
+                                widget.calculatorInput.copyWith(
+                              delayTerm: int.parse(value),
+                            );
+                          },
+                          keyboardType: const TextInputType.numberWithOptions(
+                              decimal: false),
+                        ),
+                      ],
+                    ),
                   const Spacer(),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _isValueValid ? Colors.deepPurple : Colors.grey[100],
+                        backgroundColor: _isValueValid
+                            ? Colors.deepPurple
+                            : Colors.grey[100],
                       ),
                       onPressed: () {
                         if (widget.calculatorInput.principal > 0 &&
@@ -277,7 +359,11 @@ class _CalculatorPageState extends State<CalculatorPage> {
                           _showInvalidSnackBar();
                         }
                       },
-                      child: const Text('계산하기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                      child: const Text('계산하기',
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                     ),
                   ),
                 ],
@@ -288,15 +374,16 @@ class _CalculatorPageState extends State<CalculatorPage> {
       },
     );
   }
-void _checkValueValid() {
-  _isValueValid = widget.calculatorInput.principal > 0 &&
+
+  void _checkValueValid() {
+    _isValueValid = widget.calculatorInput.principal > 0 &&
         widget.calculatorInput.interestRate > 0 &&
         widget.calculatorInput.term > 0;
-        // return _isValueValid;
+    // return _isValueValid;
   }
+
   void _showInvalidSnackBar() {
     if (widget.calculatorInput.principal == 0) {
-
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('대출 원금을 입력해주세요'),
@@ -327,7 +414,8 @@ void _checkValueValid() {
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isSelected ? Colors.deepPurple[50] : Colors.grey[200],
-          border: Border.all(color: isSelected ? Colors.deepPurple : Colors.transparent),
+          border: Border.all(
+              color: isSelected ? Colors.deepPurple : Colors.transparent),
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
@@ -346,7 +434,7 @@ void _checkValueValid() {
               style: TextStyle(
                 fontSize: 16,
                 color: isSelected ? Colors.deepPurple : Colors.black,
-                fontWeight:isSelected ? FontWeight.bold: FontWeight.normal,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
           ),
