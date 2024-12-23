@@ -279,83 +279,54 @@ class ResultPage extends StatelessWidget {
                 fontWeight: FontWeight.w100,
               ),),
             ),
-            ...[
-              Table(
-                border: TableBorder.all(),
-                columnWidths: const {
-                  0: FlexColumnWidth(0.5),
-                  1: FlexColumnWidth(),
-                  2: FlexColumnWidth(),
-                  3: FlexColumnWidth(),
-                  4: FlexColumnWidth(),
-                },
+              ...result.payments!.asMap().entries.map((entry) {
+                int index = entry.key + 1;
+                Map<String, double> payment = entry.value;
+                return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const TableRow(children: [
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('회차',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.blue)),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('납입원금(원)',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.blue)),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('납입이자(원)',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.blue)),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('납입금액(원)',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.blue)),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text('남은 원금(원)',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.blue)),
-                    ),
-                  ]),
-                  ...result.payments!.asMap().entries.map((entry) {
-                    int index = entry.key + 1;
-                    Map<String, double> payment = entry.value;
-                    return TableRow(children: [
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text('$index'),
+                Text(
+                  '$index회차',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w100,
+                  ),
+                ),
+                const Spacer(),
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      '${formatCurrency(payment['monthlyPayment']!)}원',
+                      style: const TextStyle(
+                        fontSize: 36,
+                        fontWeight: FontWeight.w900,
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child:
-                            Text(formatCurrency(payment['monthlyPrincipal']!)),
+                    ),
+                    Text(
+                      '원금 ${formatCurrency(payment['monthlyPrincipal']!)}원',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w300,
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child:
-                            Text(formatCurrency(payment['monthlyInterest']!)),
+                    ),
+                    Text(
+                      '이자 ${formatCurrency(payment['monthlyInterest']!)}원',
+                      style: TextStyle(
+                        fontSize: 24,
+                        color: Colors.grey[700],
+                        fontWeight: FontWeight.w300,
                       ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(formatCurrency(payment['monthlyPayment']!)),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.all(8.0),
-                        child: Text(formatCurrency(payment['restPrincipal']!)),
-                      ),
-                    ]);
-                  }).toList(),
-                ],
-              ),
-              Text('Total Principal: ${formatCurrency(result.totalPrincipal)}'),
-              Text('Total Interest: ${formatCurrency(result.totalInterest)}'),
-              Text('Total Payment: ${formatCurrency(result.totalPayment)}'),
-            ],
+                    ),
+                  ],
+                ),
+              ]),
+            );
+            },).toList(),
           ],
         ),
       ),
