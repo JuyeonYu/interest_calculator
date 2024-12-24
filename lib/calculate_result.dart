@@ -13,3 +13,13 @@ class CalculateResult {
     this.payments,
   });
 }
+
+class VariableInterestRate {
+  final double interestRate;
+  final int months;
+
+  VariableInterestRate({
+    required this.interestRate,
+    required this.months,
+  });
+}

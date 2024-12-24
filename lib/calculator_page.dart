@@ -1,8 +1,12 @@
+import 'dart:ffi';
+
+import 'package:cal_interest/calculate_result.dart';
 import 'package:cal_interest/input_text.dart';
 import 'package:cal_interest/result_page.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
 import 'package:cal_interest/calculator_input.dart';
+import 'package:numberpicker/numberpicker.dart';
 
 class CalculatorPage extends StatefulWidget {
   CalculatorInput calculatorInput = CalculatorInput(
@@ -19,6 +23,7 @@ class CalculatorPage extends StatefulWidget {
 }
 
 class _CalculatorPageState extends State<CalculatorPage> {
+  List<VariableInterestRate> _variableInterestRates = [];
   int _selectedOption = 0;
   bool _isValueValid = true;
   final List<String> _payDesc = [
@@ -30,6 +35,8 @@ class _CalculatorPageState extends State<CalculatorPage> {
   final FocusNode _focusNode1 = FocusNode();
   final FocusNode _focusNode2 = FocusNode();
   final FocusNode _focusNode3 = FocusNode();
+  
+  int _currentValue = 1;
 
   void _onOptionSelected(int index) {
     setState(() {
@@ -297,8 +304,144 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       _buildOption(2, '원금 일시'),
                     ],
                   ),
-                  const SizedBox(
-                    height: 24,
+                  const SizedBox(height: 24,),
+                  
+                  if (_selectedOption == 0 || _selectedOption == 1) 
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Divider(),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(0, 24, 0, 16),
+                        child: Text('선택', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      ),
+                      InputText(
+                        title: '거치 기간',
+                        placeholder: '거치 기간을 입력해주세요',
+                        surfix: '개월',
+                        isRequired: false,
+                        desc: '',
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            widget.calculatorInput = widget.calculatorInput.copyWith(delayTerm: 0,);
+                            return;
+                          }
+                          widget.calculatorInput =
+                              widget.calculatorInput.copyWith(
+                            delayTerm: int.parse(value),
+                          );
+                        },
+                        keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.fromLTRB(0, 8, 0, 16),
+                        child: Text('변동 금리'),
+                      ),
+
+
+                      ..._variableInterestRates.map((varibleInterestRate) => 
+                     Padding(
+                       padding: const EdgeInsets.all(8.0),
+                       child: Stack(
+                        clipBehavior: Clip.none,
+                         children: [
+                          Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12)),
+                           child: Padding(
+                             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                             child: Column(
+                               children: [
+                                 InputText(
+                                    title: '회차',
+                                    placeholder: '회차를 입력해주세요',
+                                    surfix: '회차',
+                                    isRequired: false,
+                                    desc: '',
+                                    onChanged: (value) {
+                                      if (value.isEmpty) {
+                                        widget.calculatorInput = widget.calculatorInput.copyWith(delayTerm: 0,);
+                                        return;
+                                      }
+                                      widget.calculatorInput =
+                                          widget.calculatorInput.copyWith(
+                                        delayTerm: int.parse(value),
+                                      );
+                                    },
+                                    keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                                  ), 
+                                  InputText(
+                                    title: '금리',
+                                    placeholder: '변동 금리를 입력해주세요',
+                                    surfix: '%',
+                                    isRequired: false,
+                                    desc: '',
+                                    onChanged: (value) {
+                                      if (value.isEmpty) {
+                                        widget.calculatorInput = widget.calculatorInput.copyWith(delayTerm: 0,);
+                                        return;
+                                      }
+                                      widget.calculatorInput =
+                                          widget.calculatorInput.copyWith(
+                                        delayTerm: int.parse(value),
+                                      );
+                                    },
+                                    keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                                  ),
+                               ],
+                             ),
+                           ),
+                         ),
+                          Positioned(
+                            top: -15,
+                            right: -15,
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _variableInterestRates.remove(varibleInterestRate);
+                                });
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                color: Colors.red[400],
+                                shape: BoxShape.circle,
+                                ),
+                                child: const Padding(
+                                padding: EdgeInsets.all(8.0),
+                                child: Icon(Icons.remove),
+                                ),
+                              ),
+                            ),
+                          ),
+                        //   ),
+                         
+                         ],
+                         
+                       ),
+                     ),
+                  ),
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _variableInterestRates.add(VariableInterestRate(
+                              months: 0,
+                              interestRate: 0,
+                            ));
+                          });
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.all(16.0),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                            Icon(Icons.add),
+                            Text('항목 추가')
+                          ],),
+                        ),
+                      ),
+                    ],
                   ),
                   if (_selectedOption == 0 || _selectedOption == 1)
                     Column(
