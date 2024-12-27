@@ -24,9 +24,10 @@ class CalculatorInput {
   final double principal;
   final double interestRate;
   final int term;
-  final int repaymentType;
+  int repaymentType;
 
   int? delayTerm;
+  List<VariableInterestRate>? variableInterestRates;
 
   RepaymentType get repaymentTypeEnum => RepaymentType.values[repaymentType];
   final String description;
@@ -36,6 +37,7 @@ class CalculatorInput {
     required this.interestRate,
     required this.term,
     this.delayTerm,
+    this.variableInterestRates,
     required this.repaymentType,
     required this.description,
   });
@@ -44,6 +46,7 @@ class CalculatorInput {
     double? principal,
     double? interestRate,
     int? term,
+    List<VariableInterestRate>? variableInterestRates,
     int? delayTerm,
     int? repaymentType,
     String? description,
@@ -52,6 +55,7 @@ class CalculatorInput {
       principal: principal ?? this.principal,
       interestRate: interestRate ?? this.interestRate,
       term: term ?? this.term,
+      variableInterestRates: variableInterestRates ?? this.variableInterestRates,
       delayTerm: delayTerm ?? this.delayTerm,
       repaymentType: repaymentType ?? this.repaymentType,
       description: description ?? this.description,
@@ -75,36 +79,39 @@ class CalculatorInput {
   CalculateResult calculateEqualPrincipalAndInterest() {
     double monthlyInterestRate = interestRate / 100 / 12;
     double monthlyPayment = principal *
-        monthlyInterestRate /
-        (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
+      monthlyInterestRate /
+      (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
     double totalPayment = monthlyPayment * (term - (delayTerm ?? 0)) +
-        (delayTerm ?? 0) * (principal * monthlyInterestRate);
+      (delayTerm ?? 0) * (principal * monthlyInterestRate);
     double totalInterest = totalPayment - principal;
     
     List<Map<String, double>> payments = [];
 
     if (delayTerm != null && delayTerm! > 0) {
       for (int i = 0; i < delayTerm!; i++) {
-        double interestPayment = principal * monthlyInterestRate;
-        payments.add({
-          'monthlyPrincipal': 0,
-          'monthlyInterest': interestPayment,
-          'monthlyPayment': interestPayment,
-          'restPrincipal': principal,
-        });
+      double interestPayment = principal * monthlyInterestRate;
+      payments.add({
+        'monthlyPrincipal': 0,
+        'monthlyInterest': interestPayment * 10000,
+        'monthlyPayment': interestPayment * 10000,
+        'restPrincipal': principal * 10000,
+      });
       }
     }
 
+    double restPrincipal = principal;
+
     for (int i = 0; i < term - (delayTerm ?? 0); i++) {
       double interestPayment =
-          (principal - (principal * i / term)) * monthlyInterestRate;
+        restPrincipal * monthlyInterestRate;
       double principalPayment = monthlyPayment - interestPayment;
-
+      restPrincipal -= principalPayment;
+      
       payments.add({
-        'monthlyPrincipal': principalPayment * 10000,
-        'monthlyInterest': interestPayment * 10000,
-        'monthlyPayment': monthlyPayment * 10000,
-        'restPrincipal': principal - (principal * (i + 1) / term) * 10000,
+      'monthlyPrincipal': principalPayment * 10000,
+      'monthlyInterest': interestPayment * 10000,
+      'monthlyPayment': monthlyPayment * 10000,
+      'restPrincipal': (principal - (principal * (i + 1) / term)) * 10000,
       });
     }
     return CalculateResult(
