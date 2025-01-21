@@ -22,4 +22,11 @@ class VariableInterestRate {
     required this.interestRate,
     required this.months,
   });
+
+  copywith({double? interestRate, int? months}) {
+    return VariableInterestRate(
+      interestRate: interestRate ?? this.interestRate,
+      months: months ?? this.months,
+    );
+  }
 }

@@ -34,6 +34,8 @@ dependencies:
   flutter_keyboard_visibility: ^6.0.0
   currency_text_input_formatter: ^2.2.6
   numberpicker: ^2.1.2
+  segmented_button_slide: ^2.0.0
+  google_mobile_ads: ^5.2.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.

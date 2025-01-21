@@ -1,5 +1,6 @@
 import 'package:cal_interest/calculator_input.dart';
 import 'package:flutter/material.dart';
+import 'package:segmented_button_slide/segmented_button_slide.dart';
 import 'calculate_result.dart';
 
 String formatCurrency(double amount) {
@@ -79,14 +80,24 @@ String convertToKoreanWithDecimal(double amount) {
   return '$integerPartKorean원 $decimalPartKorean전';
 }
 
-class ResultPage extends StatelessWidget {
+class ResultPage extends StatefulWidget {
   final CalculatorInput calculatorInput;
   const ResultPage({super.key, required this.calculatorInput});
 
   @override
+  State<ResultPage> createState() => _ResultPageState(calculatorInput: calculatorInput);
+}
+
+class _ResultPageState extends State<ResultPage> {
+  int selectedType = 0;
+  CalculatorInput calculatorInput;
+  _ResultPageState({required this.calculatorInput});
+  
+  @override
   Widget build(BuildContext context) {
-    CalculateResult result = calculatorInput.calculateResult();
+    CalculateResult result = widget.calculatorInput.calculateResult();
     ScrollController _scrollController = ScrollController();
+    // int selectedType = 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -172,7 +183,7 @@ class ResultPage extends StatelessWidget {
                     ),
                     const Spacer(),
                     Text(
-                      '${calculatorInput.term}개월',
+                      '${widget.calculatorInput.term}개월',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
@@ -181,29 +192,70 @@ class ResultPage extends StatelessWidget {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
+              const Padding(
+                padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: Row(
                   children: [
-                    const Text(
+                    Text(
                       '상환 방법',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w100,
                       ),
                     ),
-                    const Spacer(),
-                    Text(
-                      calculatorInput.repaymentTypeEnum.value(),
-                      style: const TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
+                    // const Spacer(),
                   ],
                 ),
               ),
-              if (calculatorInput.delayTerm != null)
+
+              SegmentedButtonSlide(
+                selectedEntry: selectedType,
+                onChange: (selected) => setState(() { 
+                  selectedType = selected; 
+                  calculatorInput.repaymentType = selected;
+                  }
+                  ),
+                entries: const [
+                  SegmentedButtonSlideEntry(
+                    label: "원리금균등",
+                  ),
+                  SegmentedButtonSlideEntry(
+                    label: "원금균등",
+                  ),
+                  
+                  SegmentedButtonSlideEntry(
+                    label: "만기일시",
+                  ),
+                ],
+                colors: SegmentedButtonSlideColors(
+                  barColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
+                  backgroundSelectedColor: Theme.of(context).colorScheme.primaryContainer,
+                ),
+                slideShadow: [
+                  BoxShadow(
+                    color: Colors.blue.withOpacity(1),
+                    blurRadius: 3,
+                    spreadRadius: 1,
+                  )
+                ],
+                margin: const EdgeInsets.all(16),
+                height: 40,
+                padding: const EdgeInsets.all(8),
+                borderRadius: BorderRadius.circular(8),
+                selectedTextStyle: const TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: Colors.black87,
+                ),
+                unselectedTextStyle: const TextStyle(
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black87,
+                ),
+                hoverTextStyle: const TextStyle(
+                  color: Colors.orange,
+                ),
+              ),
+
+              if (widget.calculatorInput.delayTerm != null)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -217,7 +269,7 @@ class ResultPage extends StatelessWidget {
                       ),
                       const Spacer(),
                       Text(
-                        '${calculatorInput.delayTerm}개월',
+                        '${widget.calculatorInput.delayTerm}개월',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
@@ -226,10 +278,15 @@ class ResultPage extends StatelessWidget {
                     ],
                   ),
                 ),
-              const Divider(
-                color: Colors.black,
-                thickness: 0.5,
+                
+              Padding(
+                padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+                child: Divider(
+                  color: Colors.grey[300],
+                  thickness: 20,
+                ),
               ),
+              
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: Text(
@@ -257,7 +314,6 @@ class ResultPage extends StatelessWidget {
                                 fontWeight: FontWeight.w100,
                               ),
                             ),
-                            Icon(Icons.info, color: Colors.blue[900]),
                           ],
                         ),
                         onTap: () {
@@ -265,8 +321,8 @@ class ResultPage extends StatelessWidget {
                             context: context,
                             builder: (context) {
                               return Dialog(
-                                child: CompareInterestView(
-                                    calculatorInput: calculatorInput),
+                                child: CompareInterestViewPage(
+                                    calculatorInput: widget.calculatorInput),
                               );
                             },
                           );
@@ -342,6 +398,7 @@ class ResultPage extends StatelessWidget {
                   ],
                 ),
               ),
+              
               const Divider(
                 color: Colors.black,
                 thickness: 0.5,
@@ -439,13 +496,43 @@ class ResultPage extends StatelessWidget {
   }
 }
 
+class CompareInterestViewPage extends StatefulWidget {
+  final CalculatorInput calculatorInput;
+  const CompareInterestViewPage({super.key, required this.calculatorInput});
+
+  @override
+  _CompareInterestViewPageState createState() => _CompareInterestViewPageState();
+}
+
+class _CompareInterestViewPageState extends State<CompareInterestViewPage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('상환 방법 비교'),
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            CompareInterestView(calculatorInput: widget.calculatorInput, type: 0,),
+            CompareInterestView(calculatorInput: widget.calculatorInput, type: 1,),
+            CompareInterestView(calculatorInput: widget.calculatorInput, type: 2,),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class CompareInterestView extends StatelessWidget {
   const CompareInterestView({
     super.key,
     required this.calculatorInput,
+    required this.type,
   });
 
   final CalculatorInput calculatorInput;
+  final int type;
 
   @override
   Widget build(BuildContext context) {
@@ -463,24 +550,31 @@ class CompareInterestView extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                '납부 방식 비교',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w100,
-                ),
+          Text(
+              type == 0 ? '전체 이자' : type == 1 ? '월 최저 납부액' : '월 최고 납부액',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
               ),
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-            ],
-          ),
+            ),
+          // Row(
+          //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //   children: [
+          //     const Text(
+          //       '납부 방식 비교',
+          //       style: TextStyle(
+          //         fontSize: 18,
+          //         fontWeight: FontWeight.w100,
+          //       ),
+          //     ),
+          //     IconButton(
+          //       icon: const Icon(Icons.close),
+          //       onPressed: () {
+          //         Navigator.pop(context);
+          //       },
+          //     ),
+          //   ],
+          // ),
           const SizedBox(height: 16),
           Table(
             border: TableBorder.all(color: Colors.grey),

@@ -101,7 +101,22 @@ class CalculatorInput {
 
     double restPrincipal = principal;
 
+    variableInterestRates?.sort((a, b) => a.months.compareTo(b.months));
+    VariableInterestRate? variableRate;
+    if (variableInterestRates != null && variableInterestRates!.isNotEmpty) {
+      variableRate = variableInterestRates!.removeAt(0);
+    }
+
     for (int i = 0; i < term - (delayTerm ?? 0); i++) {
+
+      if (i + 1 == variableRate?.months) {
+        monthlyInterestRate = variableRate!.interestRate / 100 / 12;
+        monthlyPayment = principal * monthlyInterestRate / (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
+        if (variableInterestRates != null && variableInterestRates!.isNotEmpty) {
+          variableRate = variableInterestRates!.removeAt(0);
+        }
+      }
+
       double interestPayment =
         restPrincipal * monthlyInterestRate;
       double principalPayment = monthlyPayment - interestPayment;
