@@ -379,7 +379,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                             widget.calculatorInput.term > 0) {
                           final box =
                               Hive.box<CalculatorInput>('CalculatorInput');
-                          await box.add(widget.calculatorInput);
+                          final newInput = widget.calculatorInput.copyWith();
+                          await box.add(newInput);
+
                           _interstitialAd?.show();
                           Navigator.push(
                             context,
