@@ -85,14 +85,15 @@ class ResultPage extends StatefulWidget {
   const ResultPage({super.key, required this.calculatorInput});
 
   @override
-  State<ResultPage> createState() => _ResultPageState(calculatorInput: calculatorInput);
+  State<ResultPage> createState() =>
+      _ResultPageState(calculatorInput: calculatorInput);
 }
 
 class _ResultPageState extends State<ResultPage> {
   int selectedType = 0;
   CalculatorInput calculatorInput;
   _ResultPageState({required this.calculatorInput});
-  
+
   @override
   Widget build(BuildContext context) {
     CalculateResult result = widget.calculatorInput.calculateResult();
@@ -192,29 +193,158 @@ class _ResultPageState extends State<ResultPage> {
                   ],
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
-                child: Row(
-                  children: [
-                    Text(
-                      '상환 방법',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w100,
-                      ),
-                    ),
-                    // const Spacer(),
-                  ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: GestureDetector(
+                  child: Row(
+                    children: [
+                      const Text('상환방식'),
+                      Icon(Icons.info, color: Colors.blue[700]),
+                    ],
+                  ),
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      builder: (context) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text(
+                                    '미래를 계획하세요!',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(Icons.close),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Table(
+                                border: TableBorder.all(),
+                                children: const [
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('상환방식',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('매달 납부 금액',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('총 이자 비용',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('특징',
+                                                  style: TextStyle(
+                                                      fontWeight:
+                                                          FontWeight.bold)))),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('원리금 균등'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('일정함'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('중간 수준'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('안정적예측 가능'))),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('원금 균등'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('점점 줄어듦'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('가장 적음'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('초기 부담 큼, 총 비용 절약'))),
+                                    ],
+                                  ),
+                                  TableRow(
+                                    children: [
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('원금 일시'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('이자만 납부'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text('가장 많음'))),
+                                      TableCell(
+                                          child: Padding(
+                                              padding: EdgeInsets.all(8.0),
+                                              child: Text(
+                                                  '초기 부담 적음, 마지막에 큰 금액 필요'))),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
                 ),
               ),
 
               SegmentedButtonSlide(
                 selectedEntry: selectedType,
-                onChange: (selected) => setState(() { 
-                  selectedType = selected; 
+                onChange: (selected) => setState(() {
+                  selectedType = selected;
                   calculatorInput.repaymentType = selected;
-                  }
-                  ),
+                }),
                 entries: const [
                   SegmentedButtonSlideEntry(
                     label: "원리금균등",
@@ -222,14 +352,17 @@ class _ResultPageState extends State<ResultPage> {
                   SegmentedButtonSlideEntry(
                     label: "원금균등",
                   ),
-                  
                   SegmentedButtonSlideEntry(
                     label: "만기일시",
                   ),
                 ],
                 colors: SegmentedButtonSlideColors(
-                  barColor: Theme.of(context).colorScheme.primaryContainer.withOpacity(0.5),
-                  backgroundSelectedColor: Theme.of(context).colorScheme.primaryContainer,
+                  barColor: Theme.of(context)
+                      .colorScheme
+                      .primaryContainer
+                      .withOpacity(0.5),
+                  backgroundSelectedColor:
+                      Theme.of(context).colorScheme.primaryContainer,
                 ),
                 slideShadow: [
                   BoxShadow(
@@ -278,7 +411,7 @@ class _ResultPageState extends State<ResultPage> {
                     ],
                   ),
                 ),
-                
+
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
                 child: Divider(
@@ -286,7 +419,7 @@ class _ResultPageState extends State<ResultPage> {
                   thickness: 20,
                 ),
               ),
-              
+
               const Padding(
                 padding: EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: Text(
@@ -398,7 +531,7 @@ class _ResultPageState extends State<ResultPage> {
                   ],
                 ),
               ),
-              
+
               const Divider(
                 color: Colors.black,
                 thickness: 0.5,
@@ -501,7 +634,8 @@ class CompareInterestViewPage extends StatefulWidget {
   const CompareInterestViewPage({super.key, required this.calculatorInput});
 
   @override
-  _CompareInterestViewPageState createState() => _CompareInterestViewPageState();
+  _CompareInterestViewPageState createState() =>
+      _CompareInterestViewPageState();
 }
 
 class _CompareInterestViewPageState extends State<CompareInterestViewPage> {
@@ -514,9 +648,18 @@ class _CompareInterestViewPageState extends State<CompareInterestViewPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            CompareInterestView(calculatorInput: widget.calculatorInput, type: 0,),
-            CompareInterestView(calculatorInput: widget.calculatorInput, type: 1,),
-            CompareInterestView(calculatorInput: widget.calculatorInput, type: 2,),
+            CompareInterestView(
+              calculatorInput: widget.calculatorInput,
+              type: 0,
+            ),
+            CompareInterestView(
+              calculatorInput: widget.calculatorInput,
+              type: 1,
+            ),
+            CompareInterestView(
+              calculatorInput: widget.calculatorInput,
+              type: 2,
+            ),
           ],
         ),
       ),
@@ -551,12 +694,16 @@ class CompareInterestView extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-              type == 0 ? '전체 이자' : type == 1 ? '월 최저 납부액' : '월 최고 납부액',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
+            type == 0
+                ? '전체 이자'
+                : type == 1
+                    ? '월 최저 납부액'
+                    : '월 최고 납부액',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
             ),
+          ),
           // Row(
           //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
           //   children: [
