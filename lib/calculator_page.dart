@@ -74,7 +74,7 @@ class _CalculatorPageState extends State<CalculatorPage> {
   final FocusNode _focusNode1 = FocusNode();
   final FocusNode _focusNode2 = FocusNode();
   final FocusNode _focusNode3 = FocusNode();
-  
+
   int _currentValue = 1;
 
   void _onOptionSelected(int index) {

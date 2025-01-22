@@ -1,6 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
     <application
-        android:label="cal_interest"
+        android:label="한눈에 대출계산기"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
