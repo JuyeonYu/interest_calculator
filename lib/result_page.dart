@@ -1,4 +1,4 @@
-import 'package:cal_interest/calculator_input.dart';
+import 'package:cal_interest/models/calculator_input.dart';
 import 'package:flutter/material.dart';
 import 'package:segmented_button_slide/segmented_button_slide.dart';
 import 'calculate_result.dart';

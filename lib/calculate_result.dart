@@ -23,6 +23,13 @@ class VariableInterestRate {
     required this.months,
   });
 
+  Map<String, dynamic> toJson() {
+    return {
+      'interestRate': interestRate,
+      'months': months,
+    };
+  }
+
   copywith({double? interestRate, int? months}) {
     return VariableInterestRate(
       interestRate: interestRate ?? this.interestRate,

@@ -5,8 +5,10 @@ import 'package:cal_interest/input_text.dart';
 import 'package:cal_interest/result_page.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
-import 'package:cal_interest/calculator_input.dart';
+import 'package:cal_interest/models/calculator_input.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:hive/hive.dart';
+
 // import 'package:numberpicker/numberpicker.dart';
 
 class CalculatorPage extends StatefulWidget {
@@ -523,7 +525,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                         backgroundColor:
                             _isValueValid ? Colors.blue[900] : Colors.grey[100],
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        final box = Hive.box<CalculatorInput>('CalculatorInput');
+                        await box.add(widget.calculatorInput);
                         _interstitialAd?.show();
                         if (widget.calculatorInput.principal > 0 &&
                             widget.calculatorInput.interestRate > 0 &&

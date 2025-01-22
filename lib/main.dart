@@ -1,8 +1,14 @@
 import 'package:cal_interest/calculator_page.dart';
+import 'package:cal_interest/history_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'models/calculator_input.dart';
 
-void main() {
+void main() async {
+  await Hive.initFlutter();
+  Hive.registerAdapter(CalculatorInputAdapter());
+  await Hive.openBox<CalculatorInput>('CalculatorInput');
   runApp(const MyApp());
 }
 
@@ -36,38 +42,32 @@ class _MainTabPageState extends State<MainTabPage> {
 
   final List<String> _titles = [
     '대출 이자 계산',
-    'Business',
-    'School',
+    '기록',
   ];
   final List<Widget> _children = [
     CalculatorPage(),
-    const Text('Business'),
-    const Text('School'),
+    const HistoryPage(),
   ];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // bottomNavigationBar: BottomNavigationBar(
-      //   currentIndex: _bottomIndex,
-      //   onTap: (value) => setState(() {
-      //     _bottomIndex = value;
-      //   }),
-      //   items: const <BottomNavigationBarItem>[
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.home),
-      //       label: 'Home',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.business),
-      //       label: 'Business',
-      //     ),
-      //     BottomNavigationBarItem(
-      //       icon: Icon(Icons.school),
-      //       label: 'School',
-      //     ),
-      //   ],
-      // ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _bottomIndex,
+        onTap: (value) => setState(() {
+          _bottomIndex = value;
+        }),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: '계산',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.business),
+            label: '기록',
+          ),
+        ],
+      ),
       appBar: AppBar(
         title: Text(_titles[_bottomIndex]),
       ),

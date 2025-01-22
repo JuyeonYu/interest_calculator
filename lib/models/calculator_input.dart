@@ -1,5 +1,7 @@
 import 'dart:math';
-import 'calculate_result.dart';
+import '../calculate_result.dart';
+import 'package:hive/hive.dart';
+part 'calculator_input.g.dart';
 
 enum RepaymentType {
   equalPrincipalAndInterest,
@@ -20,18 +22,31 @@ extension RepaymentTypeExtension on RepaymentType {
   }
 }
 
-class CalculatorInput {
+@HiveType(typeId: 0)
+class CalculatorInput extends HiveObject {
+  @HiveField(0)
   final double principal;
+
+  @HiveField(1)
   final double interestRate;
+
+  @HiveField(2)
   final int term;
+
+  @HiveField(3)
   int repaymentType;
 
+  @HiveField(4)
   int? delayTerm;
+  
+  @HiveField(5)
   List<VariableInterestRate>? variableInterestRates;
 
-  RepaymentType get repaymentTypeEnum => RepaymentType.values[repaymentType];
+  @HiveField(6)
   final String description;
-
+  
+  RepaymentType get repaymentTypeEnum => RepaymentType.values[repaymentType];
+  
   CalculatorInput({
     required this.principal,
     required this.interestRate,
@@ -41,6 +56,17 @@ class CalculatorInput {
     required this.repaymentType,
     required this.description,
   });
+  Map<String, dynamic> toJson() {
+    return {
+      'principal': principal,
+      'interestRate': interestRate,
+      'term': term,
+      'repaymentType': repaymentType,
+      'delayTerm': delayTerm,
+      'variableInterestRates': variableInterestRates?.map((e) =>  e.toJson()).toList(),
+      'description': description,
+    };
+  }
 
   CalculatorInput copyWith({
     double? principal,
