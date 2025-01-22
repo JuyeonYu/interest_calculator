@@ -161,7 +161,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                     const Spacer(),
                     Text(
-                      '${formatCurrency(calculatorInput.interestRate)}%',
+                      '${calculatorInput.interestRate}%',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
