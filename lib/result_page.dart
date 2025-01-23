@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cal_interest/models/calculator_input.dart';
 import 'package:flutter/material.dart';
 import 'package:segmented_button_slide/segmented_button_slide.dart';
@@ -98,7 +100,6 @@ class _ResultPageState extends State<ResultPage> {
   Widget build(BuildContext context) {
     CalculateResult result = widget.calculatorInput.calculateResult();
     ScrollController _scrollController = ScrollController();
-    // int selectedType = 0;
 
     return Scaffold(
       appBar: AppBar(
@@ -388,13 +389,13 @@ class _ResultPageState extends State<ResultPage> {
                 ),
               ),
 
-              if (widget.calculatorInput.delayTerm != null)
+              if ((widget.calculatorInput.delayTerm ?? 0) > 0)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
                       const Text(
-                        '연기 기간',
+                        '거치 기간',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w100,
@@ -403,6 +404,31 @@ class _ResultPageState extends State<ResultPage> {
                       const Spacer(),
                       Text(
                         '${widget.calculatorInput.delayTerm}개월',
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w900,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              if ((widget.calculatorInput.variableInterest ?? 0) > 0 &&
+                  widget.calculatorInput.variableMonth != null)
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      const Text(
+                        '변동 금리',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w100,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        '${widget.calculatorInput.variableMonth} 회 차부터 ${widget.calculatorInput.variableInterest}%',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
@@ -549,57 +575,98 @@ class _ResultPageState extends State<ResultPage> {
               ...result.payments!.asMap().entries.map((entry) {
                 int index = entry.key + 1;
                 Map<String, double> payment = entry.value;
+
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Column(
+                    spacing: 10,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-                            child: Text(
-                              '$index회차',
-                              style: const TextStyle(
-                                fontSize: 24,
+                          if ((widget.calculatorInput.delayTerm ?? 0) > 0 &&
+                              index - 1 ==
+                                  widget.calculatorInput.delayTerm) ...[
+                            const Icon(Icons.arrow_drop_up_outlined,
+                                color: Colors.red),
+                            const Text(
+                              '거치 종료',
+                              style: TextStyle(
+                                fontSize: 13,
                                 fontWeight: FontWeight.w100,
                               ),
                             ),
-                          ),
-                          if (index ~/ 12 > 0)
-                            Text('${index ~/ 12}년 ${index % 12}개월'),
-                          if (index ~/ 12 == 0 && index % 12 > 0)
-                            Text('${index % 12}개월'),
+                          ]
                         ],
                       ),
-                      const Spacer(),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            '${formatCurrency(payment['monthlyPayment']!)}원',
-                            style: const TextStyle(
-                              fontSize: 24,
-                              fontWeight: FontWeight.w900,
+                          if (index ==
+                              widget.calculatorInput.variableMonth) ...[
+                            const Icon(Icons.arrow_drop_down_outlined,
+                                color: Colors.blue),
+                            Text(
+                              '금리 변동(${widget.calculatorInput.variableInterest}%)',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w100,
+                              ),
                             ),
+                          ]
+                        ],
+                      ),
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+                                child: Text(
+                                  '$index회차',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w100,
+                                  ),
+                                ),
+                              ),
+                              if (index ~/ 12 > 0)
+                                Text('${index ~/ 12}년 ${index % 12}개월'),
+                              if (index ~/ 12 == 0 && index % 12 > 0)
+                                Text('${index % 12}개월'),
+                            ],
                           ),
-                          Text(
-                            '원금 ${formatCurrency(payment['monthlyPrincipal']!)}원',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w300,
-                            ),
-                          ),
-                          Text(
-                            '이자 ${formatCurrency(payment['monthlyInterest']!)}원',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.grey[700],
-                              fontWeight: FontWeight.w300,
-                            ),
+                          const Spacer(),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                '${formatCurrency(payment['monthlyPayment']!)}원',
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w900,
+                                ),
+                              ),
+                              Text(
+                                '원금 ${formatCurrency(payment['monthlyPrincipal']!)}원',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                              Text(
+                                '이자 ${formatCurrency(payment['monthlyInterest']!)}원',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.grey[700],
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),

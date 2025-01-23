@@ -11,8 +11,6 @@ import 'package:cal_interest/models/calculator_input.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:hive/hive.dart';
 
-// import 'package:numberpicker/numberpicker.dart';
-
 class CalculatorPage extends StatefulWidget {
   CalculatorInput calculatorInput = CalculatorInput(
     principal: 0,
@@ -64,6 +62,10 @@ class _CalculatorPageState extends State<CalculatorPage> {
   List<VariableInterestRate> _variableInterestRates = [
     VariableInterestRate(interestRate: 0, months: 0)
   ];
+
+  // VariableInterestRate _variableInterestRate = VariableInterestRate(interestRate: 0, months: 0);
+  double? _variableInterest;
+  int? _variableMonth;
   int _selectedOption = 0;
   bool _isValueValid = true;
   final List<String> _payDesc = [
@@ -233,6 +235,218 @@ class _CalculatorPageState extends State<CalculatorPage> {
                           keyboardType: const TextInputType.numberWithOptions(
                               decimal: false),
                         ),
+                      const Text('변동 금리'),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Stack(
+                          clipBehavior: Clip.none,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12)),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                                child: Column(
+                                  children: [
+                                    InputText(
+                                      title: '회차',
+                                      placeholder: '회차를 입력해주세요',
+                                      surfix: '회차',
+                                      isRequired: false,
+                                      desc: '',
+                                      onChanged: (value) {
+                                        if (value.isEmpty) {
+                                          return;
+                                        }
+
+                                        int start = int.parse(value);
+                                        if (start < 1) {
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text('1회차 이상 입력해주세요.'),
+                                            ),
+                                          );
+                                          return;
+                                        }
+
+                                        widget.calculatorInput.variableMonth =
+                                            int.parse(value);
+
+                                        // _variableMonth = int.parse(value);
+                                      },
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: false),
+                                    ),
+                                    InputText(
+                                      title: '금리',
+                                      placeholder: '변동 금리를 입력해주세요',
+                                      surfix: '%',
+                                      isRequired: false,
+                                      desc: '',
+                                      onChanged: (value) {
+                                        if (value.isEmpty) {
+                                          widget.calculatorInput = widget
+                                              .calculatorInput
+                                              .copyWith(interestRate: 0);
+                                          return;
+                                        }
+
+                                        // double d = double.parse(value);
+                                        // _variableInterest = d;
+
+                                        widget.calculatorInput
+                                                .variableInterest =
+                                            double.parse(value);
+                                      },
+                                      keyboardType:
+                                          const TextInputType.numberWithOptions(
+                                              decimal: false),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                      // ..._variableInterestRates.asMap().entries.map((entry) {
+                      //   int variableIndex = entry.key;
+                      //   VariableInterestRate varibleInterestRate = entry.value;
+                      //   return Padding(
+                      //     padding: const EdgeInsets.all(8.0),
+                      //     child: Stack(
+                      //       clipBehavior: Clip.none,
+                      //       children: [
+                      //         Container(
+                      //           decoration: BoxDecoration(
+                      //               color: Colors.grey[100],
+                      //               borderRadius: BorderRadius.circular(12)),
+                      //           child: Padding(
+                      //             padding:
+                      //                 const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                      //             child: Column(
+                      //               children: [
+                      //                 InputText(
+                      //                   title: '회차',
+                      //                   placeholder: '회차를 입력해주세요',
+                      //                   surfix: '회차',
+                      //                   isRequired: false,
+                      //                   desc: '',
+                      //                   onChanged: (value) {
+                      //                     if (value.isEmpty) {
+                      //                       return;
+                      //                     }
+
+                      //                     int start = int.parse(value);
+                      //                     if (start < 1) {
+                      //                       ScaffoldMessenger.of(context)
+                      //                           .showSnackBar(
+                      //                         const SnackBar(
+                      //                           content: Text('1회차 이상 입력해주세요.'),
+                      //                         ),
+                      //                       );
+                      //                       return;
+                      //                     }
+
+                      //                     if (start < 1) {
+                      //                       ScaffoldMessenger.of(context)
+                      //                           .showSnackBar(
+                      //                         const SnackBar(
+                      //                           content: Text('1회차 이상 입력해주세요.'),
+                      //                         ),
+                      //                       );
+                      //                       return;
+                      //                     }
+                      //                     if (_variableInterestRates
+                      //                         .map((element) => element.months)
+                      //                         .contains(start)) {
+                      //                       return;
+                      //                     }
+
+                      //                     _variableInterestRates[
+                      //                             variableIndex] =
+                      //                         _variableInterestRates[
+                      //                                 variableIndex]
+                      //                             .copywith(
+                      //                                 months: int.parse(value));
+                      //                     widget.calculatorInput
+                      //                             .variableInterestRates =
+                      //                         _variableInterestRates;
+                      //                   },
+                      //                   keyboardType: const TextInputType
+                      //                       .numberWithOptions(decimal: false),
+                      //                 ),
+                      //                 InputText(
+                      //                   title: '금리',
+                      //                   placeholder: '변동 금리를 입력해주세요',
+                      //                   surfix: '%',
+                      //                   isRequired: false,
+                      //                   desc: '',
+                      //                   onChanged: (value) {
+                      //                     if (value.isEmpty) {
+                      //                       widget.calculatorInput = widget
+                      //                           .calculatorInput
+                      //                           .copyWith(interestRate: 0);
+                      //                       return;
+                      //                     }
+                      //                     try {
+                      //                       double d = double.parse(value);
+                      //                       _variableInterestRates[
+                      //                               variableIndex] =
+                      //                           _variableInterestRates[
+                      //                                   variableIndex]
+                      //                               .copywith(interestRate: d);
+                      //                       widget.calculatorInput.copyWith(
+                      //                           variableInterestRates:
+                      //                               _variableInterestRates);
+                      //                       print(d);
+                      //                     } catch (e) {
+                      //                       print('Invalid input string');
+                      //                     }
+                      //                   },
+                      //                   keyboardType: const TextInputType
+                      //                       .numberWithOptions(decimal: false),
+                      //                 ),
+                      //               ],
+                      //             ),
+                      //           ),
+                      //         ),
+                      //         if (variableIndex > 0 &&
+                      //             variableIndex ==
+                      //                 _variableInterestRates.length - 1)
+                      //           Positioned(
+                      //             top: 0,
+                      //             right: 0,
+                      //             child: GestureDetector(
+                      //               onTap: () {
+                      //                 setState(() {
+                      //                   _variableInterestRates
+                      //                       .removeAt(variableIndex);
+                      //                   widget.calculatorInput.copyWith(
+                      //                       variableInterestRates:
+                      //                           _variableInterestRates);
+                      //                 });
+                      //               },
+                      //               child: Container(
+                      //                 decoration: BoxDecoration(
+                      //                   color: Colors.red[400],
+                      //                   shape: BoxShape.circle,
+                      //                 ),
+                      //                 child: const Padding(
+                      //                   padding: EdgeInsets.all(8.0),
+                      //                   child: Icon(Icons.remove),
+                      //                 ),
+                      //               ),
+                      //             ),
+                      //           ),
+                      //       ],
+                      //     ),
+                      //   );
+                      // }),
                     ],
                   ),
                   const Spacer(),

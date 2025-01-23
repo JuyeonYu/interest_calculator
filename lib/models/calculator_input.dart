@@ -40,7 +40,10 @@ class CalculatorInput extends HiveObject {
   int? delayTerm;
 
   @HiveField(5)
-  List<VariableInterestRate>? variableInterestRates;
+  double? variableInterest;
+
+  @HiveField(5)
+  int? variableMonth;
 
   @HiveField(6)
   final String description;
@@ -52,7 +55,8 @@ class CalculatorInput extends HiveObject {
     required this.interestRate,
     required this.term,
     this.delayTerm,
-    this.variableInterestRates,
+    this.variableInterest,
+    this.variableMonth,
     required this.repaymentType,
     required this.description,
   });
@@ -63,8 +67,8 @@ class CalculatorInput extends HiveObject {
       'term': term,
       'repaymentType': repaymentType,
       'delayTerm': delayTerm,
-      'variableInterestRates':
-          variableInterestRates?.map((e) => e.toJson()).toList(),
+      'variableInterest': variableInterest,
+      'variableMonth': variableMonth,
       'description': description,
     };
   }
@@ -73,7 +77,8 @@ class CalculatorInput extends HiveObject {
     double? principal,
     double? interestRate,
     int? term,
-    List<VariableInterestRate>? variableInterestRates,
+    double? variableInterest,
+    int? variableMonth,
     int? delayTerm,
     int? repaymentType,
     String? description,
@@ -82,8 +87,8 @@ class CalculatorInput extends HiveObject {
       principal: principal ?? this.principal,
       interestRate: interestRate ?? this.interestRate,
       term: term ?? this.term,
-      variableInterestRates:
-          variableInterestRates ?? this.variableInterestRates,
+      variableInterest: variableInterest ?? this.variableInterest,
+      variableMonth: variableMonth ?? this.variableMonth,
       delayTerm: delayTerm ?? this.delayTerm,
       repaymentType: repaymentType ?? this.repaymentType,
       description: description ?? this.description,
@@ -129,22 +134,12 @@ class CalculatorInput extends HiveObject {
 
     double restPrincipal = principal;
 
-    variableInterestRates?.sort((a, b) => a.months.compareTo(b.months));
-    VariableInterestRate? variableRate;
-    if (variableInterestRates != null && variableInterestRates!.isNotEmpty) {
-      variableRate = variableInterestRates!.removeAt(0);
-    }
-
     for (int i = 0; i < term - (delayTerm ?? 0); i++) {
-      if (i + 1 == variableRate?.months) {
-        monthlyInterestRate = variableRate!.interestRate / 100 / 12;
+      if (i + 1 == variableMonth) {
+        monthlyInterestRate = variableInterest! / 100 / 12;
         monthlyPayment = principal *
             monthlyInterestRate /
             (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
-        if (variableInterestRates != null &&
-            variableInterestRates!.isNotEmpty) {
-          variableRate = variableInterestRates!.removeAt(0);
-        }
       }
 
       double interestPayment = restPrincipal * monthlyInterestRate;
