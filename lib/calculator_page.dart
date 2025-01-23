@@ -294,13 +294,6 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                           isRequired: false,
                                           desc: '',
                                           onChanged: (value) {
-                                            if (value.isEmpty) {
-                                              widget.calculatorInput = widget
-                                                  .calculatorInput
-                                                  .copyWith(interestRate: 0);
-                                              return;
-                                            }
-
                                             widget.calculatorInput
                                                     .variableInterest =
                                                 double.parse(value);
