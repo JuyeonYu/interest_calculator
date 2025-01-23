@@ -17,8 +17,8 @@ class CalculatorInputAdapter extends TypeAdapter<CalculatorInput> {
       interestRate: reader.readDouble(),
       term: reader.readInt(),
       delayTerm: reader.read(),
-      variableInterest: reader.readDouble(),
-      variableMonth: reader.readInt(),
+      variableInterest: reader.read(),
+      variableMonth: reader.read(),
       repaymentType: reader.readInt(),
       description: reader.readString(),
     );

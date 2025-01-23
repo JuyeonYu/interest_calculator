@@ -37,15 +37,15 @@ class CalculatorInput extends HiveObject {
 
   @HiveField(4)
   int? delayTerm;
-  
+
   @HiveField(5)
   List<VariableInterestRate>? variableInterestRates;
 
   @HiveField(6)
   final String description;
-  
+
   RepaymentType get repaymentTypeEnum => RepaymentType.values[repaymentType];
-  
+
   CalculatorInput({
     required this.principal,
     required this.interestRate,
@@ -62,7 +62,8 @@ class CalculatorInput extends HiveObject {
       'term': term,
       'repaymentType': repaymentType,
       'delayTerm': delayTerm,
-      'variableInterestRates': variableInterestRates?.map((e) =>  e.toJson()).toList(),
+      'variableInterestRates':
+          variableInterestRates?.map((e) => e.toJson()).toList(),
       'description': description,
     };
   }
@@ -80,7 +81,8 @@ class CalculatorInput extends HiveObject {
       principal: principal ?? this.principal,
       interestRate: interestRate ?? this.interestRate,
       term: term ?? this.term,
-      variableInterestRates: variableInterestRates ?? this.variableInterestRates,
+      variableInterestRates:
+          variableInterestRates ?? this.variableInterestRates,
       delayTerm: delayTerm ?? this.delayTerm,
       repaymentType: repaymentType ?? this.repaymentType,
       description: description ?? this.description,
@@ -104,23 +106,23 @@ class CalculatorInput extends HiveObject {
   CalculateResult calculateEqualPrincipalAndInterest() {
     double monthlyInterestRate = interestRate / 100 / 12;
     double monthlyPayment = principal *
-      monthlyInterestRate /
-      (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
+        monthlyInterestRate /
+        (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
     double totalPayment = monthlyPayment * (term - (delayTerm ?? 0)) +
-      (delayTerm ?? 0) * (principal * monthlyInterestRate);
+        (delayTerm ?? 0) * (principal * monthlyInterestRate);
     double totalInterest = totalPayment - principal;
-    
+
     List<Map<String, double>> payments = [];
 
     if (delayTerm != null && delayTerm! > 0) {
       for (int i = 0; i < delayTerm!; i++) {
-      double interestPayment = principal * monthlyInterestRate;
-      payments.add({
-        'monthlyPrincipal': 0,
-        'monthlyInterest': interestPayment * 10000,
-        'monthlyPayment': interestPayment * 10000,
-        'restPrincipal': principal * 10000,
-      });
+        double interestPayment = principal * monthlyInterestRate;
+        payments.add({
+          'monthlyPrincipal': 0,
+          'monthlyInterest': interestPayment * 10000,
+          'monthlyPayment': interestPayment * 10000,
+          'restPrincipal': principal * 10000,
+        });
       }
     }
 
@@ -133,25 +135,26 @@ class CalculatorInput extends HiveObject {
     }
 
     for (int i = 0; i < term - (delayTerm ?? 0); i++) {
-
       if (i + 1 == variableRate?.months) {
         monthlyInterestRate = variableRate!.interestRate / 100 / 12;
-        monthlyPayment = principal * monthlyInterestRate / (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
-        if (variableInterestRates != null && variableInterestRates!.isNotEmpty) {
+        monthlyPayment = principal *
+            monthlyInterestRate /
+            (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
+        if (variableInterestRates != null &&
+            variableInterestRates!.isNotEmpty) {
           variableRate = variableInterestRates!.removeAt(0);
         }
       }
 
-      double interestPayment =
-        restPrincipal * monthlyInterestRate;
+      double interestPayment = restPrincipal * monthlyInterestRate;
       double principalPayment = monthlyPayment - interestPayment;
       restPrincipal -= principalPayment;
-      
+
       payments.add({
-      'monthlyPrincipal': principalPayment * 10000,
-      'monthlyInterest': interestPayment * 10000,
-      'monthlyPayment': monthlyPayment * 10000,
-      'restPrincipal': (principal - (principal * (i + 1) / term)) * 10000,
+        'monthlyPrincipal': principalPayment * 10000,
+        'monthlyInterest': interestPayment * 10000,
+        'monthlyPayment': monthlyPayment * 10000,
+        'restPrincipal': (principal - (principal * (i + 1) / term)) * 10000,
       });
     }
     return CalculateResult(

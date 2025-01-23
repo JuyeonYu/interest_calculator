@@ -48,5 +48,10 @@
     
     <key>GADApplicationIdentifier</key>
     <string>ca-app-pub-7604048409167711~2180730804</string>
+
+    <key>NSUserTrackingUsageDescription</key>
+    <string>This identifier will be used to deliver personalized ads to you.</string>
+
+
 </dict>
 </plist>

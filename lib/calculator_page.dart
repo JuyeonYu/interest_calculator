@@ -301,16 +301,12 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                               return;
                                             }
 
-                                            // double d = double.parse(value);
-                                            // _variableInterest = d;
-
                                             widget.calculatorInput
                                                     .variableInterest =
                                                 double.parse(value);
                                           },
                                           keyboardType: const TextInputType
-                                              .numberWithOptions(
-                                              decimal: false),
+                                              .numberWithOptions(decimal: true),
                                         ),
                                       ],
                                     ),
