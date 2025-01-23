@@ -222,7 +222,7 @@ class CalculatorInput extends HiveObject {
         payments.add({
           'monthlyPrincipal': principal * 10000,
           'monthlyInterest': monthlyInterest * 10000,
-          'monthlyPayment': principal + monthlyInterest,
+          'monthlyPayment': principal * 10000 + monthlyInterest,
           'restPrincipal': 0,
         });
       } else {

@@ -130,7 +130,7 @@ class _ResultPageState extends State<ResultPage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '${formatCurrency(calculatorInput.principal)}만 원',
+                          '${formatCurrency(calculatorInput.principal * 10000)} 원',
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.w900,
@@ -438,9 +438,9 @@ class _ResultPageState extends State<ResultPage> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
                       child: GestureDetector(
-                        child: Row(
+                        child: const Row(
                           children: [
-                            const Text(
+                            Text(
                               '전체 이자',
                               style: TextStyle(
                                 fontSize: 18,
@@ -467,7 +467,7 @@ class _ResultPageState extends State<ResultPage> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          '${formatCurrency(result.totalInterest)}만 원',
+                          '${formatCurrency(result.totalInterest)}원',
                           style: TextStyle(
                               fontSize: 24,
                               fontWeight: FontWeight.w900,
@@ -500,7 +500,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                     const Spacer(),
                     Text(
-                      '${formatCurrency(result.payments!.first['monthlyPayment']!)}만원',
+                      '${formatCurrency(result.payments!.first['monthlyPayment']!)}원',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
@@ -522,7 +522,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                     const Spacer(),
                     Text(
-                      '${formatCurrency(result.payments!.last['monthlyPayment']!)}만원',
+                      '${formatCurrency(result.payments!.last['monthlyPayment']!)}원',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
