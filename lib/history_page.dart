@@ -42,7 +42,8 @@ class HistoryPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ResultPage(calculatorInput: input!),
+                        builder: (context) =>
+                            ResultPage(calculatorInput: input!),
                       ),
                     );
                   },
@@ -53,12 +54,5 @@ class HistoryPage extends StatelessWidget {
         }
       },
     );
-  }
-
-  Future<Box<CalculatorInput>> _openBox() async {
-    if (!Hive.isBoxOpen('calculatorInputs')) {
-      return await Hive.openBox<CalculatorInput>('calculatorInputs');
-    }
-    return Hive.box<CalculatorInput>('calculatorInputs');
   }
 }

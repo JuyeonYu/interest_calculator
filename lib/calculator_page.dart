@@ -110,388 +110,266 @@ class _CalculatorPageState extends State<CalculatorPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: constraints.maxHeight,
-            ),
-            child: IntrinsicHeight(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: <Widget>[
-                  InputText(
-                    title: '대출원금',
-                    placeholder: '대출 원금을 입력해주세요',
-                    surfix: '만원',
-                    isRequired: true,
-                    focusNode: _focusNode1,
-                    desc: widget.calculatorInput.principal == 0
-                        ? ''
-                        : '${formatKoreanCurrency(widget.calculatorInput.principal)}원',
-                    inputFormatters: [
-                      CurrencyTextInputFormatter.currency(
-                        locale: 'ko',
-                        decimalDigits: 0,
-                        symbol: '',
-                      )
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        if (value.isEmpty) {
-                          widget.calculatorInput =
-                              widget.calculatorInput.copyWith(
-                            principal: 0,
-                          );
-                          return;
-                        }
-                        value = value.replaceAll(RegExp(r'[^0-9]'), '');
-                        widget.calculatorInput =
-                            widget.calculatorInput.copyWith(
-                          principal: double.parse(value),
-                        );
-                      });
-                    },
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                  ),
-                  InputText(
-                    title: '이자율',
-                    placeholder: '이자율을 입력해주세요',
-                    surfix: '%',
-                    isRequired: true,
-                    desc: '',
-                    onChanged: (value) {
-                      setState(() {
-                        if (value.isEmpty) {
-                          widget.calculatorInput =
-                              widget.calculatorInput.copyWith(
-                            interestRate: 0,
-                          );
-                          return;
-                        }
-                        widget.calculatorInput =
-                            widget.calculatorInput.copyWith(
-                          interestRate: double.parse(value),
-                        );
-                      });
-                    },
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: true),
-                    focusNode: _focusNode2,
-                  ),
-                  InputText(
-                    title: '대출 기간',
-                    placeholder: '대출 기간을 입력해주세요',
-                    surfix: '개월',
-                    isRequired: true,
-                    desc: '',
-                    onChanged: (value) {
-                      if (value.isEmpty) {
-                        widget.calculatorInput =
-                            widget.calculatorInput.copyWith(
-                          term: 0,
-                        );
-                        return;
-                      }
-                      widget.calculatorInput = widget.calculatorInput.copyWith(
-                        term: int.parse(value),
-                      );
-                    },
-                    keyboardType:
-                        const TextInputType.numberWithOptions(decimal: false),
-                    focusNode: _focusNode3,
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // const Divider(),
-                      const Padding(
-                        padding: EdgeInsets.fromLTRB(0, 24, 0, 16),
-                        child: Text('선택',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                      ),
-                      if (_selectedOption == 0 || _selectedOption == 1)
-                        InputText(
-                          title: '거치 기간',
-                          placeholder: '거치 기간을 입력해주세요',
-                          surfix: '개월',
-                          isRequired: false,
-                          desc: '',
-                          onChanged: (value) {
+        return Stack(
+          children: [
+            SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 120),
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight,
+                ),
+                child: IntrinsicHeight(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget>[
+                      InputText(
+                        title: '대출원금',
+                        placeholder: '대출 원금을 입력해주세요',
+                        surfix: '만원',
+                        isRequired: true,
+                        focusNode: _focusNode1,
+                        desc: widget.calculatorInput.principal == 0
+                            ? ''
+                            : '${formatKoreanCurrency(widget.calculatorInput.principal)}원',
+                        inputFormatters: [
+                          CurrencyTextInputFormatter.currency(
+                            locale: 'ko',
+                            decimalDigits: 0,
+                            symbol: '',
+                          )
+                        ],
+                        onChanged: (value) {
+                          setState(() {
                             if (value.isEmpty) {
                               widget.calculatorInput =
                                   widget.calculatorInput.copyWith(
-                                delayTerm: 0,
+                                principal: 0,
+                              );
+                              return;
+                            }
+                            value = value.replaceAll(RegExp(r'[^0-9]'), '');
+                            widget.calculatorInput =
+                                widget.calculatorInput.copyWith(
+                              principal: double.parse(value),
+                            );
+                          });
+                        },
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                      ),
+                      InputText(
+                        title: '이자율',
+                        placeholder: '이자율을 입력해주세요',
+                        surfix: '%',
+                        isRequired: true,
+                        desc: '',
+                        onChanged: (value) {
+                          setState(() {
+                            if (value.isEmpty) {
+                              widget.calculatorInput =
+                                  widget.calculatorInput.copyWith(
+                                interestRate: 0,
                               );
                               return;
                             }
                             widget.calculatorInput =
                                 widget.calculatorInput.copyWith(
-                              delayTerm: int.parse(value),
+                              interestRate: double.parse(value),
                             );
-                          },
-                          keyboardType: const TextInputType.numberWithOptions(
-                              decimal: false),
-                        ),
-                      const Text('변동 금리'),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Stack(
-                          clipBehavior: Clip.none,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(12)),
-                              child: Padding(
-                                padding:
-                                    const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                                child: Column(
-                                  children: [
-                                    InputText(
-                                      title: '회차',
-                                      placeholder: '회차를 입력해주세요',
-                                      surfix: '회차',
-                                      isRequired: false,
-                                      desc: '',
-                                      onChanged: (value) {
-                                        if (value.isEmpty) {
-                                          return;
-                                        }
-
-                                        int start = int.parse(value);
-                                        if (start < 1) {
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            const SnackBar(
-                                              content: Text('1회차 이상 입력해주세요.'),
-                                            ),
-                                          );
-                                          return;
-                                        }
-
-                                        widget.calculatorInput.variableMonth =
-                                            int.parse(value);
-
-                                        // _variableMonth = int.parse(value);
-                                      },
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: false),
-                                    ),
-                                    InputText(
-                                      title: '금리',
-                                      placeholder: '변동 금리를 입력해주세요',
-                                      surfix: '%',
-                                      isRequired: false,
-                                      desc: '',
-                                      onChanged: (value) {
-                                        if (value.isEmpty) {
-                                          widget.calculatorInput = widget
-                                              .calculatorInput
-                                              .copyWith(interestRate: 0);
-                                          return;
-                                        }
-
-                                        // double d = double.parse(value);
-                                        // _variableInterest = d;
-
-                                        widget.calculatorInput
-                                                .variableInterest =
-                                            double.parse(value);
-                                      },
-                                      keyboardType:
-                                          const TextInputType.numberWithOptions(
-                                              decimal: false),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                          });
+                        },
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        focusNode: _focusNode2,
+                      ),
+                      InputText(
+                        title: '대출 기간',
+                        placeholder: '대출 기간을 입력해주세요',
+                        surfix: '개월',
+                        isRequired: true,
+                        desc: '',
+                        onChanged: (value) {
+                          if (value.isEmpty) {
+                            widget.calculatorInput =
+                                widget.calculatorInput.copyWith(
+                              term: 0,
+                            );
+                            return;
+                          }
+                          widget.calculatorInput =
+                              widget.calculatorInput.copyWith(
+                            term: int.parse(value),
+                          );
+                        },
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: false),
+                        focusNode: _focusNode3,
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // const Divider(),
+                          const Padding(
+                            padding: EdgeInsets.fromLTRB(0, 24, 0, 16),
+                            child: Text('선택',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                          ),
+                          if (_selectedOption == 0 || _selectedOption == 1)
+                            InputText(
+                              title: '거치 기간',
+                              placeholder: '거치 기간을 입력해주세요',
+                              surfix: '개월',
+                              isRequired: false,
+                              desc: '',
+                              onChanged: (value) {
+                                if (value.isEmpty) {
+                                  widget.calculatorInput =
+                                      widget.calculatorInput.copyWith(
+                                    delayTerm: 0,
+                                  );
+                                  return;
+                                }
+                                widget.calculatorInput =
+                                    widget.calculatorInput.copyWith(
+                                  delayTerm: int.parse(value),
+                                );
+                              },
+                              keyboardType:
+                                  const TextInputType.numberWithOptions(
+                                      decimal: false),
                             ),
-                          ],
-                        ),
-                      )
-                      // ..._variableInterestRates.asMap().entries.map((entry) {
-                      //   int variableIndex = entry.key;
-                      //   VariableInterestRate varibleInterestRate = entry.value;
-                      //   return Padding(
-                      //     padding: const EdgeInsets.all(8.0),
-                      //     child: Stack(
-                      //       clipBehavior: Clip.none,
-                      //       children: [
-                      //         Container(
-                      //           decoration: BoxDecoration(
-                      //               color: Colors.grey[100],
-                      //               borderRadius: BorderRadius.circular(12)),
-                      //           child: Padding(
-                      //             padding:
-                      //                 const EdgeInsets.fromLTRB(16, 16, 16, 0),
-                      //             child: Column(
-                      //               children: [
-                      //                 InputText(
-                      //                   title: '회차',
-                      //                   placeholder: '회차를 입력해주세요',
-                      //                   surfix: '회차',
-                      //                   isRequired: false,
-                      //                   desc: '',
-                      //                   onChanged: (value) {
-                      //                     if (value.isEmpty) {
-                      //                       return;
-                      //                     }
+                          const Text('변동 금리'),
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      color: Colors.grey[100],
+                                      borderRadius: BorderRadius.circular(12)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        16, 16, 16, 0),
+                                    child: Column(
+                                      children: [
+                                        InputText(
+                                          title: '회차',
+                                          placeholder: '회차를 입력해주세요',
+                                          surfix: '회차',
+                                          isRequired: false,
+                                          desc: '',
+                                          onChanged: (value) {
+                                            if (value.isEmpty) {
+                                              return;
+                                            }
 
-                      //                     int start = int.parse(value);
-                      //                     if (start < 1) {
-                      //                       ScaffoldMessenger.of(context)
-                      //                           .showSnackBar(
-                      //                         const SnackBar(
-                      //                           content: Text('1회차 이상 입력해주세요.'),
-                      //                         ),
-                      //                       );
-                      //                       return;
-                      //                     }
+                                            int start = int.parse(value);
+                                            if (start < 1) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                const SnackBar(
+                                                  content:
+                                                      Text('1회차 이상 입력해주세요.'),
+                                                ),
+                                              );
+                                              return;
+                                            }
 
-                      //                     if (start < 1) {
-                      //                       ScaffoldMessenger.of(context)
-                      //                           .showSnackBar(
-                      //                         const SnackBar(
-                      //                           content: Text('1회차 이상 입력해주세요.'),
-                      //                         ),
-                      //                       );
-                      //                       return;
-                      //                     }
-                      //                     if (_variableInterestRates
-                      //                         .map((element) => element.months)
-                      //                         .contains(start)) {
-                      //                       return;
-                      //                     }
+                                            widget.calculatorInput
+                                                    .variableMonth =
+                                                int.parse(value);
 
-                      //                     _variableInterestRates[
-                      //                             variableIndex] =
-                      //                         _variableInterestRates[
-                      //                                 variableIndex]
-                      //                             .copywith(
-                      //                                 months: int.parse(value));
-                      //                     widget.calculatorInput
-                      //                             .variableInterestRates =
-                      //                         _variableInterestRates;
-                      //                   },
-                      //                   keyboardType: const TextInputType
-                      //                       .numberWithOptions(decimal: false),
-                      //                 ),
-                      //                 InputText(
-                      //                   title: '금리',
-                      //                   placeholder: '변동 금리를 입력해주세요',
-                      //                   surfix: '%',
-                      //                   isRequired: false,
-                      //                   desc: '',
-                      //                   onChanged: (value) {
-                      //                     if (value.isEmpty) {
-                      //                       widget.calculatorInput = widget
-                      //                           .calculatorInput
-                      //                           .copyWith(interestRate: 0);
-                      //                       return;
-                      //                     }
-                      //                     try {
-                      //                       double d = double.parse(value);
-                      //                       _variableInterestRates[
-                      //                               variableIndex] =
-                      //                           _variableInterestRates[
-                      //                                   variableIndex]
-                      //                               .copywith(interestRate: d);
-                      //                       widget.calculatorInput.copyWith(
-                      //                           variableInterestRates:
-                      //                               _variableInterestRates);
-                      //                       print(d);
-                      //                     } catch (e) {
-                      //                       print('Invalid input string');
-                      //                     }
-                      //                   },
-                      //                   keyboardType: const TextInputType
-                      //                       .numberWithOptions(decimal: false),
-                      //                 ),
-                      //               ],
-                      //             ),
-                      //           ),
-                      //         ),
-                      //         if (variableIndex > 0 &&
-                      //             variableIndex ==
-                      //                 _variableInterestRates.length - 1)
-                      //           Positioned(
-                      //             top: 0,
-                      //             right: 0,
-                      //             child: GestureDetector(
-                      //               onTap: () {
-                      //                 setState(() {
-                      //                   _variableInterestRates
-                      //                       .removeAt(variableIndex);
-                      //                   widget.calculatorInput.copyWith(
-                      //                       variableInterestRates:
-                      //                           _variableInterestRates);
-                      //                 });
-                      //               },
-                      //               child: Container(
-                      //                 decoration: BoxDecoration(
-                      //                   color: Colors.red[400],
-                      //                   shape: BoxShape.circle,
-                      //                 ),
-                      //                 child: const Padding(
-                      //                   padding: EdgeInsets.all(8.0),
-                      //                   child: Icon(Icons.remove),
-                      //                 ),
-                      //               ),
-                      //             ),
-                      //           ),
-                      //       ],
-                      //     ),
-                      //   );
-                      // }),
+                                            // _variableMonth = int.parse(value);
+                                          },
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(
+                                              decimal: false),
+                                        ),
+                                        InputText(
+                                          title: '금리',
+                                          placeholder: '변동 금리를 입력해주세요',
+                                          surfix: '%',
+                                          isRequired: false,
+                                          desc: '',
+                                          onChanged: (value) {
+                                            if (value.isEmpty) {
+                                              widget.calculatorInput = widget
+                                                  .calculatorInput
+                                                  .copyWith(interestRate: 0);
+                                              return;
+                                            }
+
+                                            // double d = double.parse(value);
+                                            // _variableInterest = d;
+
+                                            widget.calculatorInput
+                                                    .variableInterest =
+                                                double.parse(value);
+                                          },
+                                          keyboardType: const TextInputType
+                                              .numberWithOptions(
+                                              decimal: false),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      // const Spacer(),
                     ],
                   ),
-                  const Spacer(),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                            _isValueValid ? Colors.blue[900] : Colors.grey[100],
-                      ),
-                      onPressed: () async {
-                        if (widget.calculatorInput.principal > 0 &&
-                            widget.calculatorInput.interestRate > 0 &&
-                            widget.calculatorInput.term > 0) {
-                          final box =
-                              Hive.box<CalculatorInput>('CalculatorInput');
-                          final newInput = widget.calculatorInput.copyWith();
-                          await box.add(newInput);
-
-                          _interstitialAd?.show();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => ResultPage(
-                                  calculatorInput: widget.calculatorInput),
-                            ),
-                          );
-                        } else {
-                          _showInvalidSnackBar();
-                        }
-                      },
-                      child: const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text('계산하기',
-                            style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white)),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: -10,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0, 0, 0, 48),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                        _isValueValid ? Colors.blue[900] : Colors.grey[100],
+                  ),
+                  onPressed: () async {
+                    if (widget.calculatorInput.principal > 0 &&
+                        widget.calculatorInput.interestRate > 0 &&
+                        widget.calculatorInput.term > 0) {
+                      final box = Hive.box<CalculatorInput>('CalculatorInput');
+                      final newInput = widget.calculatorInput.copyWith();
+                      await box.add(newInput);
+
+                      _interstitialAd?.show();
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ResultPage(
+                              calculatorInput: widget.calculatorInput),
+                        ),
+                      );
+                    } else {
+                      _showInvalidSnackBar();
+                    }
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Text('계산하기',
+                        style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
+                  ),
+                ),
+              ),
+            ),
+          ],
         );
       },
     );
