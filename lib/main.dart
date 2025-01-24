@@ -70,6 +70,16 @@ class _MainTabPageState extends State<MainTabPage> {
       ),
       appBar: AppBar(
         title: Text(_titles[_bottomIndex]),
+        actions: [
+          if (_bottomIndex == 1) 
+            IconButton(
+            icon: const Icon(Icons.delete_sweep),
+            color: Colors.red[500],
+            onPressed: () {
+              Hive.box<CalculatorInput>('CalculatorInput').clear();
+            },
+            )
+        ],
       ),
       body: _children[_bottomIndex],
     );

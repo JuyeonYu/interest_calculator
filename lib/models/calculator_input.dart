@@ -172,6 +172,10 @@ class CalculatorInput extends HiveObject {
 
     if (delayTerm != null && delayTerm! > 0) {
       for (int i = 0; i < delayTerm!; i++) {
+        if (i + 1 == variableMonth) {
+        monthlyInterestRate = variableInterest! / 100 / 12;
+      }
+
         double interestPayment = restPrincipal * monthlyInterestRate;
         totalInterest += interestPayment;
         payments.add({
@@ -184,6 +188,10 @@ class CalculatorInput extends HiveObject {
     }
 
     for (int i = 0; i < term - (delayTerm ?? 0); i++) {
+      if (i + 1 == variableMonth) {
+        monthlyInterestRate = variableInterest! / 100 / 12;
+      }
+
       double interestPayment = restPrincipal * monthlyInterestRate;
       double totalPayment = monthlyPrincipal + interestPayment;
 
@@ -209,10 +217,17 @@ class CalculatorInput extends HiveObject {
   CalculateResult calculateLumpSumRepayment() {
     double totalInterest = principal * interestRate / 100 * term / 12;
     double totalPayment = principal + totalInterest;
+    double monthlyInterestRate = interestRate / 100 / 12;
 
     List<Map<String, double>> payments = [];
     for (int i = 0; i < term; i++) {
-      double monthlyInterest = principal * interestRate / 100 / 12;
+
+      if (i + 1 == variableMonth) {
+        monthlyInterestRate = variableInterest! / 100 / 12;
+      }
+
+      double monthlyInterest = principal * monthlyInterestRate;
+
       if (i == term - 1) {
         payments.add({
           'monthlyPrincipal': principal * 10000,
