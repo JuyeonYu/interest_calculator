@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:cal_interest/models/calculator_input.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:segmented_button_slide/segmented_button_slide.dart';
 import 'calculate_result.dart';
 
@@ -104,6 +105,12 @@ class _ResultPageState extends State<ResultPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('계산 결과'),
+        actions: [
+          IconButton(icon: Icon(Icons.delete, color: Colors.red[500],), onPressed: () {
+            Hive.box<CalculatorInput>('CalculatorInput').delete(widget.calculatorInput.key);
+            Navigator.pop(context);
+          },)
+        ],
       ),
       body: Stack(
         children: [
@@ -579,7 +586,7 @@ class _ResultPageState extends State<ResultPage> {
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    spacing: 10,
+                    // spacing: 10,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
