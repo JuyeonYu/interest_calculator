@@ -4,11 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'models/calculator_input.dart';
+import 'models/variable_interest_rate.dart';
 
 void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(CalculatorInputAdapter());
-  await Hive.openBox<CalculatorInput>('CalculatorInput');
+  Hive.registerAdapter(VariableInterestRateAdapter());
+  var box = await Hive.openBox<CalculatorInput>('CalculatorInput');
+  
+  // 데이터 초기화 (개발 중에만 사용)
+  await box.clear();
+  
   runApp(const MyApp());
 }
 
@@ -76,7 +82,10 @@ class _MainTabPageState extends State<MainTabPage> {
             icon: const Icon(Icons.delete_sweep),
             color: Colors.red[500],
             onPressed: () {
-              Hive.box<CalculatorInput>('CalculatorInput').clear();
+              var box = Hive.box<CalculatorInput>('CalculatorInput');
+              if (box != null) {
+                box.clear();
+              }
             },
             )
         ],

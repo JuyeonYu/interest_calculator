@@ -1,6 +1,8 @@
 import 'dart:math';
 import '../calculate_result.dart';
 import 'package:hive/hive.dart';
+import 'variable_interest_rate.dart';
+
 part 'calculator_input.g.dart';
 
 enum RepaymentType {
@@ -24,6 +26,8 @@ extension RepaymentTypeExtension on RepaymentType {
 
 @HiveType(typeId: 0)
 class CalculatorInput extends HiveObject {
+  @HiveField(7)
+  final String id = DateTime.now().millisecondsSinceEpoch.toString();
   @HiveField(0)
   final double principal;
 
@@ -40,10 +44,7 @@ class CalculatorInput extends HiveObject {
   int? delayTerm;
 
   @HiveField(5)
-  double? variableInterest;
-
-  @HiveField(5)
-  int? variableMonth;
+  List<VariableInterestRate> variableInterestRates;
 
   @HiveField(6)
   final String description;
@@ -55,11 +56,11 @@ class CalculatorInput extends HiveObject {
     required this.interestRate,
     required this.term,
     this.delayTerm,
-    this.variableInterest,
-    this.variableMonth,
+    List<VariableInterestRate>? variableInterestRates,
     required this.repaymentType,
     required this.description,
-  });
+  }) : variableInterestRates = variableInterestRates ?? [];
+
   Map<String, dynamic> toJson() {
     return {
       'principal': principal,
@@ -67,8 +68,8 @@ class CalculatorInput extends HiveObject {
       'term': term,
       'repaymentType': repaymentType,
       'delayTerm': delayTerm,
-      'variableInterest': variableInterest,
-      'variableMonth': variableMonth,
+      'variableInterestRates':
+          variableInterestRates.map((e) => e.toJson()).toList(),
       'description': description,
     };
   }
@@ -77,8 +78,7 @@ class CalculatorInput extends HiveObject {
     double? principal,
     double? interestRate,
     int? term,
-    double? variableInterest,
-    int? variableMonth,
+    List<VariableInterestRate>? variableInterestRates,
     int? delayTerm,
     int? repaymentType,
     String? description,
@@ -87,8 +87,8 @@ class CalculatorInput extends HiveObject {
       principal: principal ?? this.principal,
       interestRate: interestRate ?? this.interestRate,
       term: term ?? this.term,
-      variableInterest: variableInterest ?? this.variableInterest,
-      variableMonth: variableMonth ?? this.variableMonth,
+      variableInterestRates:
+          variableInterestRates ?? this.variableInterestRates,
       delayTerm: delayTerm ?? this.delayTerm,
       repaymentType: repaymentType ?? this.repaymentType,
       description: description ?? this.description,
@@ -134,12 +134,24 @@ class CalculatorInput extends HiveObject {
 
     double restPrincipal = principal;
 
+    variableInterestRates.sort((a, b) => a.months.compareTo(b.months));
+    int variableIndex = 0;
+    VariableInterestRate? variableRate = variableInterestRates.isNotEmpty
+        ? variableInterestRates[variableIndex]
+        : null;
+
     for (int i = 0; i < term - (delayTerm ?? 0); i++) {
-      if (i + 1 == variableMonth) {
-        monthlyInterestRate = variableInterest! / 100 / 12;
+      if (variableRate != null && i + 1 == variableRate.months) {
+        monthlyInterestRate = variableRate.interestRate / 100 / 12;
         monthlyPayment = principal *
             monthlyInterestRate /
             (1 - pow(1 + monthlyInterestRate, -(term - (delayTerm ?? 0))));
+        variableIndex++;
+        if (variableIndex < variableInterestRates.length) {
+          variableRate = variableInterestRates[variableIndex];
+        } else {
+          variableRate = null;
+        }
       }
 
       double interestPayment = restPrincipal * monthlyInterestRate;
@@ -172,10 +184,6 @@ class CalculatorInput extends HiveObject {
 
     if (delayTerm != null && delayTerm! > 0) {
       for (int i = 0; i < delayTerm!; i++) {
-        if (i + 1 == variableMonth) {
-        monthlyInterestRate = variableInterest! / 100 / 12;
-      }
-
         double interestPayment = restPrincipal * monthlyInterestRate;
         totalInterest += interestPayment;
         payments.add({
@@ -187,9 +195,21 @@ class CalculatorInput extends HiveObject {
       }
     }
 
+    variableInterestRates.sort((a, b) => a.months.compareTo(b.months));
+    int variableIndex = 0;
+    VariableInterestRate? variableRate = variableInterestRates.isNotEmpty
+        ? variableInterestRates[variableIndex]
+        : null;
+
     for (int i = 0; i < term - (delayTerm ?? 0); i++) {
-      if (i + 1 == variableMonth) {
-        monthlyInterestRate = variableInterest! / 100 / 12;
+      if (variableRate != null && i + 1 == variableRate.months) {
+        monthlyInterestRate = variableRate.interestRate / 100 / 12;
+        variableIndex++;
+        if (variableIndex < variableInterestRates.length) {
+          variableRate = variableInterestRates[variableIndex];
+        } else {
+          variableRate = null;
+        }
       }
 
       double interestPayment = restPrincipal * monthlyInterestRate;
@@ -220,10 +240,22 @@ class CalculatorInput extends HiveObject {
     double monthlyInterestRate = interestRate / 100 / 12;
 
     List<Map<String, double>> payments = [];
-    for (int i = 0; i < term; i++) {
 
-      if (i + 1 == variableMonth) {
-        monthlyInterestRate = variableInterest! / 100 / 12;
+    variableInterestRates.sort((a, b) => a.months.compareTo(b.months));
+    int variableIndex = 0;
+    VariableInterestRate? variableRate = variableInterestRates.isNotEmpty
+        ? variableInterestRates[variableIndex]
+        : null;
+
+    for (int i = 0; i < term; i++) {
+      if (variableRate != null && i + 1 == variableRate.months) {
+        monthlyInterestRate = variableRate.interestRate / 100 / 12;
+        variableIndex++;
+        if (variableIndex < variableInterestRates.length) {
+          variableRate = variableInterestRates[variableIndex];
+        } else {
+          variableRate = null;
+        }
       }
 
       double monthlyInterest = principal * monthlyInterestRate;
@@ -232,7 +264,7 @@ class CalculatorInput extends HiveObject {
         payments.add({
           'monthlyPrincipal': principal * 10000,
           'monthlyInterest': monthlyInterest * 10000,
-          'monthlyPayment': principal * 10000 + monthlyInterest,
+          'monthlyPayment': principal + monthlyInterest,
           'restPrincipal': 0,
         });
       } else {

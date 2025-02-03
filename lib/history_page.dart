@@ -20,6 +20,7 @@ class HistoryPage extends StatelessWidget {
             itemCount: box.length,
             itemBuilder: (context, index) {
               var input = box.getAt(box.length - 1 - index);
+
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                 child: ListTile(
@@ -43,7 +44,7 @@ class HistoryPage extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            ResultPage(calculatorInput: input!),
+                            ResultPage(id: input!.id),
                       ),
                     );
                   },

@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:cal_interest/models/calculator_input.dart';
+import 'package:cal_interest/models/variable_interest_rate.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:segmented_button_slide/segmented_button_slide.dart';
@@ -84,12 +85,22 @@ String convertToKoreanWithDecimal(double amount) {
 }
 
 class ResultPage extends StatefulWidget {
-  final CalculatorInput calculatorInput;
-  const ResultPage({super.key, required this.calculatorInput});
+  // final CalculatorInput calculatorInput;
+  final String id;
+  TextEditingController changeInterestRateController = TextEditingController();
+
+  ResultPage({super.key, required this.id});
+
+  // @override
+  // State<ResultPage> createState() =>
+  //     _ResultPageState(calculatorInput: calculatorInput);
 
   @override
-  State<ResultPage> createState() =>
-      _ResultPageState(calculatorInput: calculatorInput);
+  State<StatefulWidget> createState() {
+    var box = Hive.box<CalculatorInput>('CalculatorInput');
+    var item = box.get(id)!;
+    return _ResultPageState(calculatorInput: item);
+  }
 }
 
 class _ResultPageState extends State<ResultPage> {
@@ -99,15 +110,16 @@ class _ResultPageState extends State<ResultPage> {
 
   @override
   Widget build(BuildContext context) {
-    CalculateResult result = widget.calculatorInput.calculateResult();
-    ScrollController _scrollController = ScrollController();
+    CalculateResult result = calculatorInput.calculateResult();
+    ScrollController scrollController = ScrollController();
+    
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('계산 결과'),
         actions: [
           IconButton(icon: Icon(Icons.delete, color: Colors.red[500],), onPressed: () {
-            Hive.box<CalculatorInput>('CalculatorInput').delete(widget.calculatorInput.key);
+            Hive.box<CalculatorInput>('CalculatorInput').delete(calculatorInput.id);
             Navigator.pop(context);
           },)
         ],
@@ -115,7 +127,7 @@ class _ResultPageState extends State<ResultPage> {
       body: Stack(
         children: [
           ListView(
-            controller: _scrollController,
+            controller: scrollController,
             padding: const EdgeInsets.only(bottom: 80), // 패딩 추가
             children: [
               Padding(
@@ -192,7 +204,7 @@ class _ResultPageState extends State<ResultPage> {
                     ),
                     const Spacer(),
                     Text(
-                      '${widget.calculatorInput.term}개월',
+                      '${calculatorInput.term}개월',
                       style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.w900,
@@ -352,6 +364,7 @@ class _ResultPageState extends State<ResultPage> {
                 onChange: (selected) => setState(() {
                   selectedType = selected;
                   calculatorInput.repaymentType = selected;
+                  // _updateCalculatorInput();
                 }),
                 entries: const [
                   SegmentedButtonSlideEntry(
@@ -396,7 +409,7 @@ class _ResultPageState extends State<ResultPage> {
                 ),
               ),
 
-              if ((widget.calculatorInput.delayTerm ?? 0) > 0)
+              if ((calculatorInput.delayTerm ?? 0) > 0)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -410,7 +423,7 @@ class _ResultPageState extends State<ResultPage> {
                       ),
                       const Spacer(),
                       Text(
-                        '${widget.calculatorInput.delayTerm}개월',
+                        '${calculatorInput.delayTerm}개월',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
@@ -420,8 +433,33 @@ class _ResultPageState extends State<ResultPage> {
                   ),
                 ),
 
-              if ((widget.calculatorInput.variableInterest ?? 0) > 0 &&
-                  widget.calculatorInput.variableMonth != null)
+              
+              // if ((widget.calculatorInput.variableInterest ?? 0) > 0 &&
+              //     widget.calculatorInput.variableMonth != null)
+              //   Padding(
+              //     padding: const EdgeInsets.all(16.0),
+              //     child: Row(
+              //       children: [
+              //         const Text(
+              //           '변동 금리',
+              //           style: TextStyle(
+              //             fontSize: 18,
+              //             fontWeight: FontWeight.w100,
+              //           ),
+              //         ),
+              //         const Spacer(),
+              //         Text(
+              //           '${widget.calculatorInput.variableMonth} 회 차부터 ${widget.calculatorInput.variableInterest}%',
+              //           style: const TextStyle(
+              //             fontSize: 24,
+              //             fontWeight: FontWeight.w900,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              if (calculatorInput.variableInterestRates != null &&
+                  calculatorInput.variableInterestRates!.isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
@@ -435,7 +473,7 @@ class _ResultPageState extends State<ResultPage> {
                       ),
                       const Spacer(),
                       Text(
-                        '${widget.calculatorInput.variableMonth} 회 차부터 ${widget.calculatorInput.variableInterest}%',
+                        '${calculatorInput.variableInterestRates!.join(', ')}%',
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w900,
@@ -488,7 +526,7 @@ class _ResultPageState extends State<ResultPage> {
                             builder: (context) {
                               return Dialog(
                                 child: CompareInterestViewPage(
-                                    calculatorInput: widget.calculatorInput),
+                                    calculatorInput: calculatorInput),
                               );
                             },
                           );
@@ -586,14 +624,13 @@ class _ResultPageState extends State<ResultPage> {
                 return Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
-                    // spacing: 10,
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if ((widget.calculatorInput.delayTerm ?? 0) > 0 &&
+                          if ((calculatorInput.delayTerm ?? 0) > 0 &&
                               index - 1 ==
-                                  widget.calculatorInput.delayTerm) ...[
+                                  calculatorInput.delayTerm) ...[
                             const Icon(Icons.arrow_drop_up_outlined,
                                 color: Colors.red),
                             const Text(
@@ -609,73 +646,113 @@ class _ResultPageState extends State<ResultPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (index ==
-                              widget.calculatorInput.variableMonth) ...[
-                            const Icon(Icons.arrow_drop_down_outlined,
-                                color: Colors.blue),
-                            Text(
-                              '금리 변동(${widget.calculatorInput.variableInterest}%)',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w100,
-                              ),
-                            ),
-                          ]
+                          // if (index ==
+                          //     widget.calculatorInput.variableMonth) ...[
+                          //   const Icon(Icons.arrow_drop_down_outlined,
+                          //       color: Colors.blue),
+                          //   Text(
+                          //     '금리 변동(${widget.calculatorInput.variableInterest}%)',
+                          //     style: const TextStyle(
+                          //       fontSize: 13,
+                          //       fontWeight: FontWeight.w100,
+                          //     ),
+                          //   ),
+                          // ]
+                          
                         ],
                       ),
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
-                                child: Text(
-                                  '$index회차',
-                                  style: const TextStyle(
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.w100,
+                      GestureDetector(
+                        onTap: () {
+                          showModalBottomSheet(
+                            context: context,
+                            builder: (context) {
+                              return Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ListTile(
+                                    leading: const Icon(Icons.trending_up),
+                                    title: const Text('금리 변동'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      _showInterestRateChangeDialog(context, index);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.payment),
+                                    title: const Text('중도 상환'),
+                                    onTap: () {
+                                      Navigator.pop(context);
+                                      _showEarlyRepaymentDialog(context, index);
+                                    },
+                                  ),
+                                  ListTile(
+                                    leading: const Icon(Icons.cancel),
+                                    title: const Text('취소'),
+                                    onTap: () {
+
+                                      Navigator.pop(context);
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(width: 30, height: 80,child: Icon(Icons.add_circle, color: Colors.blue[800],), ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0, 12, 0, 0),
+                                  child: Text(
+                                    '$index회차',
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.w100,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              if (index ~/ 12 > 0)
-                                Text('${index ~/ 12}년 ${index % 12}개월'),
-                              if (index ~/ 12 == 0 && index % 12 > 0)
-                                Text('${index % 12}개월'),
-                            ],
-                          ),
-                          const Spacer(),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                '${formatCurrency(payment['monthlyPayment']!)}원',
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w900,
+                                if (index ~/ 12 > 0)
+                                  Text('${index ~/ 12}년 ${index % 12}개월'),
+                                if (index ~/ 12 == 0 && index % 12 > 0)
+                                  Text('${index % 12}개월'),
+                              ],
+                            ),
+                            const Spacer(),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  '${formatCurrency(payment['monthlyPayment']!)}원',
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w900,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '원금 ${formatCurrency(payment['monthlyPrincipal']!)}원',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey[700],
-                                  fontWeight: FontWeight.w300,
+                                Text(
+                                  '원금 ${formatCurrency(payment['monthlyPrincipal']!)}원',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[700],
+                                    fontWeight: FontWeight.w300,
+                                  ),
                                 ),
-                              ),
-                              Text(
-                                '이자 ${formatCurrency(payment['monthlyInterest']!)}원',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey[700],
-                                  fontWeight: FontWeight.w300,
+                                Text(
+                                  '이자 ${formatCurrency(payment['monthlyInterest']!)}원',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey[700],
+                                    fontWeight: FontWeight.w300,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -688,7 +765,7 @@ class _ResultPageState extends State<ResultPage> {
             right: 16,
             child: FloatingActionButton(
               onPressed: () {
-                _scrollController.animateTo(
+                scrollController.animateTo(
                   0,
                   duration: const Duration(seconds: 1),
                   curve: Curves.easeInOut,
@@ -700,6 +777,90 @@ class _ResultPageState extends State<ResultPage> {
         ],
       ),
     );
+  }
+
+  void _showInterestRateChangeDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('금리 변동'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('회차: $index'),
+              TextField(
+                controller: widget.changeInterestRateController,
+                decoration: const InputDecoration(
+                  labelText: '변동 금리 (%)',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+
+                calculatorInput.variableInterestRates ??= [];
+
+                calculatorInput.variableInterestRates?.add(VariableInterestRate(months: index + 1, interestRate: double.parse(widget.changeInterestRateController.text)));
+                _updateCalculatorInput();
+                Navigator.pop(context);
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showEarlyRepaymentDialog(BuildContext context, int index) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('중도 상환'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('회차: $index'),
+              TextField(
+                decoration: const InputDecoration(
+                  labelText: '상환 금액 (원)',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('확인'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _updateCalculatorInput() {
+    Hive.box<CalculatorInput>('CalculatorInput').put(calculatorInput.id, calculatorInput);
   }
 }
 

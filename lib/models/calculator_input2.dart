@@ -1,4 +1,5 @@
 import 'package:cal_interest/calculate_result.dart';
+import 'package:cal_interest/models/variable_interest_rate.dart';
 import 'package:hive/hive.dart';
 
 // part 'calculator_input.g.dart';

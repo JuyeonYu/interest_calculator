@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:cal_interest/models/variable_interest_rate.dart';
+
 import '../calculate_result.dart';
 import 'package:hive/hive.dart';
 

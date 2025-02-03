@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:cal_interest/calculate_result.dart';
 import 'package:cal_interest/input_text.dart';
+import 'package:cal_interest/models/variable_interest_rate.dart';
 import 'package:cal_interest/result_page.dart';
 import 'package:currency_text_input_formatter/currency_text_input_formatter.dart';
 import 'package:flutter/material.dart';
@@ -277,9 +278,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                               return;
                                             }
 
-                                            widget.calculatorInput
-                                                    .variableMonth =
-                                                int.parse(value);
+                                            // widget.calculatorInput
+                                            //         .variableMonth =
+                                            //     int.parse(value);
 
                                             // _variableMonth = int.parse(value);
                                           },
@@ -294,9 +295,9 @@ class _CalculatorPageState extends State<CalculatorPage> {
                                           isRequired: false,
                                           desc: '',
                                           onChanged: (value) {
-                                            widget.calculatorInput
-                                                    .variableInterest =
-                                                double.parse(value);
+                                            // widget.calculatorInput
+                                            //         .variableInterest =
+                                            //     double.parse(value);
                                           },
                                           keyboardType: const TextInputType
                                               .numberWithOptions(decimal: true),
@@ -335,12 +336,13 @@ class _CalculatorPageState extends State<CalculatorPage> {
                       final newInput = widget.calculatorInput.copyWith();
                       await box.add(newInput);
 
+
                       _interstitialAd?.show();
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => ResultPage(
-                              calculatorInput: widget.calculatorInput),
+                              id: widget.calculatorInput.id),
                         ),
                       );
                     } else {

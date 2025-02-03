@@ -14,26 +14,6 @@ class CalculateResult {
   });
 }
 
-class VariableInterestRate {
-  final double interestRate;
-  final int months;
 
-  VariableInterestRate({
-    required this.interestRate,
-    required this.months,
-  });
 
-  Map<String, dynamic> toJson() {
-    return {
-      'interestRate': interestRate,
-      'months': months,
-    };
-  }
 
-  copywith({double? interestRate, int? months}) {
-    return VariableInterestRate(
-      interestRate: interestRate ?? this.interestRate,
-      months: months ?? this.months,
-    );
-  }
-}
